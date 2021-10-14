@@ -21,5 +21,5 @@ public class Team {
     private String title;
     private String teamType; // team type ID
     private String managedBy; // management ID
-    private String[] crew; // CrewPerson IDs
+    private String[] crew; // TeamMember IDs
 }

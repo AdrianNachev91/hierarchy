@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Builder
 @Accessors(chain = true)
 @Data
-@Document(collation = "crew-person")
-public class CrewPerson extends Person {
+@Document(collation = "team-member")
+public class TeamMember extends Person {
     private String managedBy; // Corporate ID here, must be a lead of the management of this team
 }
