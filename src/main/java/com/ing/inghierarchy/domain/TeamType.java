@@ -18,5 +18,5 @@ public class TeamType {
 
     @Id
     private String id;
-    private String title; // i.e. tribe or chapter
+    private String title; // i.e. squad or chapter
 }
