@@ -18,5 +18,5 @@ public class TeamManagement {
 
     @Id
     private String id;
-    private ManagementPerson[] person;
+    private String[] managerChain; // ids of managers
 }
