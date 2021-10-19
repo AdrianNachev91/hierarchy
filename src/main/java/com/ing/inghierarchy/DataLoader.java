@@ -47,7 +47,6 @@ public class DataLoader implements ApplicationRunner {
 				.corporateId("100002")
 				.name("Member Two")
 				.roleId(roleDev.getId())
-				.managedBy(member1.getCorporateId())
 				.build();
 		this.memberRepo.save(member1);
 		this.memberRepo.save(member2);

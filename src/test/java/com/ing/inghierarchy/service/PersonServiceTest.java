@@ -2,8 +2,10 @@ package com.ing.inghierarchy.service;
 
 import com.ing.inghierarchy.Exceptions.IngHttpException;
 import com.ing.inghierarchy.domain.Manager;
+import com.ing.inghierarchy.domain.TeamMember;
 import com.ing.inghierarchy.repositories.ManagerRepository;
 import com.ing.inghierarchy.repositories.RoleRepository;
+import com.ing.inghierarchy.repositories.TeamMemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,10 +25,12 @@ class PersonServiceTest {
     private RoleRepository roleRepository;
     @Mock
     private ManagerRepository managerRepository;
+    @Mock
+    private TeamMemberRepository teamMemberRepository;
 
     @BeforeEach
     void setUp() {
-        personService = new PersonService(roleRepository, managerRepository);
+        personService = new PersonService(roleRepository, managerRepository, teamMemberRepository);
     }
 
     @Test
@@ -134,5 +138,112 @@ class PersonServiceTest {
         // Verify
         assertThat(e).isInstanceOf(IngHttpException.class);
         assertThat(e.getMessage()).isEqualTo("Manager does not exist");
+    }
+
+    @Test
+    void createTeamMember() {
+
+        // Prepare
+        var teamMemberRequest = teamMemberRequest("name", "corporate-id", "role-id");
+        when(roleRepository.existsById("role-id")).thenReturn(true);
+        var teamMember = teamMember("name", "corporate-id", "role-id");
+        when(teamMemberRepository.save(teamMember)).thenReturn(teamMember);
+
+        // Test
+        TeamMember result = personService.createTeamMember(teamMemberRequest);
+
+        // Verify
+        assertThat(result).isEqualTo(teamMember);
+    }
+
+    @Test
+    void createTeamMember_RoleDoesNotExist() {
+
+        // Prepare
+        var teamMemberRequest = teamMemberRequest("name", "corporate-id", "role-id");
+        when(roleRepository.existsById("role-id")).thenReturn(false);
+
+        // Test
+        Throwable e = catchThrowable(() -> personService.createTeamMember(teamMemberRequest));
+
+        // Verify
+        assertThat(e).isInstanceOf(IngHttpException.class);
+        assertThat(e.getMessage()).isEqualTo("Cannot create a team member with non-existing role");
+    }
+
+    @Test
+    void updateTeamMember() {
+
+        // Prepare
+        var teamMemberRequest = teamMemberRequest("name", "corporate-id", "role-id");
+        when(teamMemberRepository.existsById("team-member-id")).thenReturn(true);
+        when(roleRepository.existsById("role-id")).thenReturn(true);
+        var teamMember = teamMember("name", "corporate-id", "role-id");
+        teamMember.setId("team-member-id");
+        when(teamMemberRepository.save(teamMember)).thenReturn(teamMember);
+
+        // Test
+        TeamMember result = personService.updateTeamMember("team-member-id", teamMemberRequest);
+
+        // Verify
+        assertThat(result).isEqualTo(teamMember);
+    }
+
+    @Test
+    void updateTeamMember_TeamMemberDoesNotExist() {
+
+        // Prepare
+        var teamMemberRequest = teamMemberRequest("name", "corporate-id", "role-id");
+        when(teamMemberRepository.existsById("team-member-id")).thenReturn(false);
+
+        // Test
+        Throwable e = catchThrowable(() -> personService.updateTeamMember("team-member-id", teamMemberRequest));
+
+        // Verify
+        assertThat(e).isInstanceOf(IngHttpException.class);
+        assertThat(e.getMessage()).isEqualTo("Team member does not exist");
+    }
+
+    @Test
+    void updateTeamMember_RoleDoesNotExist() {
+
+        // Prepare
+        var teamMemberRequest = teamMemberRequest("name", "corporate-id", "role-id");
+        when(teamMemberRepository.existsById("team-member-id")).thenReturn(true);
+        when(roleRepository.existsById("role-id")).thenReturn(false);
+
+        // Test
+        Throwable e = catchThrowable(() -> personService.updateTeamMember("team-member-id", teamMemberRequest));
+
+        // Verify
+        assertThat(e).isInstanceOf(IngHttpException.class);
+        assertThat(e.getMessage()).isEqualTo("Cannot create a team member with non-existing role");
+    }
+
+    @Test
+    void deleteTeamMember() {
+
+        // Prepare
+        when(teamMemberRepository.existsById("team-member-id")).thenReturn(true);
+
+        // Test
+        personService.deleteTeamMember("team-member-id");
+
+        // Verify
+        verify(teamMemberRepository).deleteById("team-member-id");
+    }
+
+    @Test
+    void deleteTeamMember_TeamMemberDoesNotExist() {
+
+        // Prepare
+        when(teamMemberRepository.existsById("team-member-id")).thenReturn(false);
+
+        // Test
+        Throwable e = catchThrowable(() -> personService.deleteTeamMember("team-member-id"));
+
+        // Verify
+        assertThat(e).isInstanceOf(IngHttpException.class);
+        assertThat(e.getMessage()).isEqualTo("Team member does not exist");
     }
 }
