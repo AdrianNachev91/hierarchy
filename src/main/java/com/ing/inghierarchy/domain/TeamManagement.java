@@ -13,8 +13,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Builder
 @Accessors(chain = true)
 @Data
-@Document(collation = "team-management")
+@Document(collection = "team-management")
 public class TeamManagement {
+
+    public static final String COLLECTION_NAME = "team-management";
 
     @Id
     private String id;

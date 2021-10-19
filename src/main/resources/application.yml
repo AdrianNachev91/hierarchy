@@ -2,3 +2,4 @@ spring:
   data:
     mongodb:
       port: 27018
+      database: hierarchies
