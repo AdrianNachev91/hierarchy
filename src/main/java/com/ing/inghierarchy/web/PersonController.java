@@ -35,4 +35,15 @@ public class PersonController {
     public Manager createManager(@RequestBody @Valid ManagerRequest managerRequest) {
         return personService.createManager(managerRequest);
     }
+
+    @PutMapping("/manager/{id}")
+    public Manager updateManager(@Parameter(name = "id", required = true) @PathVariable("id") String id,
+                                 @RequestBody @Valid ManagerRequest managerRequest) {
+        return personService.updateManager(id, managerRequest);
+    }
+
+    @DeleteMapping("/manager/{id}")
+    public void deleteManager(@Parameter(name = "id", required = true) @PathVariable("id") String id) {
+        personService.deleteManager(id);
+    }
 }

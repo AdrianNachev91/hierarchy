@@ -2,6 +2,7 @@ package com.ing.inghierarchy.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
@@ -19,6 +20,7 @@ import javax.validation.constraints.NotBlank;
 @CompoundIndexes({
         @CompoundIndex(name = "corporate-id_role-id", def = "{'corporateId' : 1, 'roleId': 1}")
 })
+@EqualsAndHashCode(exclude = {"id"})
 public class Person {
     @Id
     private String id;

@@ -94,4 +94,71 @@ class PersonControllerTest {
                         "'roleId':'1'" +
                         "}")));
     }
+
+    @Test
+    void createManager_InvalidRequest() throws Exception {
+
+        // Test & Verify
+        mockMvc.perform(post("/person/manager")
+                        .contentType(APPLICATION_JSON)
+                        .content(json("{" +
+                                "'lead':true," +
+                                "'manages':'employee'," +
+                                "'corporateId':null," +
+                                "'roleId':null" +
+                                "}"))
+                        .characterEncoding("utf-8"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(content().json(json("{" +
+                        "'errors':" +
+                        "   {" +
+                        "       'roleId':'must not be blank'," +
+                        "       'name':'must not be blank'," +
+                        "       'corporateId':'must not be blank'" +
+                        "   }" +
+                        "}")));
+    }
+
+    @Test
+    void createManager_MalformedJson() throws Exception {
+
+        // Test & Verify
+        mockMvc.perform(post("/person/manager")
+                        .contentType(APPLICATION_JSON)
+                        .content(json("{" +
+                                "'name':true," +
+                                "'lead':'yes'," +
+                                "'manages':true," +
+                                "'corporateId':true," +
+                                "'roleId':true" +
+                                "}"))
+                        .characterEncoding("utf-8"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(json("{" +
+                        "'message':'Malformed JSON request'" +
+                        "}")));
+    }
+
+    @Test
+    void deleteManager() throws Exception {
+
+        // Test & Verify
+        mockMvc.perform(delete("/person/manager/{id}", "1"))
+                .andExpect(status().isOk());
+
+        verify(personService).deleteManager("1");
+    }
+
+    @Test
+    void deleteManager_HttpException() throws Exception {
+
+        // Prepare
+        doThrow(IngHttpException.notFound("Manager not found")).when(personService).deleteManager("1");
+
+        // Test & Verify
+        mockMvc.perform(delete("/person/manager/{id}", "1"))
+                .andExpect(status().isNotFound())
+                .andExpect((content().json(json("{'message':'Manager not found'}"))));
+    }
 }

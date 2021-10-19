@@ -30,4 +30,28 @@ public class PersonService {
         Manager manager = new ModelMapper().map(managerRequest, Manager.class);
         return managerRepository.save(manager);
     }
+
+    public Manager updateManager(String id, ManagerRequest managerRequest) {
+
+        if (!managerRepository.existsById(id)) {
+            throw IngHttpException.notFound("Manager does not exist");
+        }
+
+        if (!roleRepository.existsById(managerRequest.getRoleId())) {
+            throw IngHttpException.forbidden("Cannot create a manager with non-existing role");
+        }
+
+        Manager manager = new ModelMapper().map(managerRequest, Manager.class);
+        manager.setId(id);
+        return managerRepository.save(manager);
+    }
+
+    public void deleteManager(String id) {
+
+        if (!managerRepository.existsById(id)) {
+            throw IngHttpException.notFound("Manager does not exist");
+        }
+
+        managerRepository.deleteById(id);
+    }
 }
