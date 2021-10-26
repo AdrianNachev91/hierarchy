@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ManagerRepository extends MongoRepository<Manager, String>, ManagerRepositoryCustom {
-
+    boolean existsByIdAndLead(String id, boolean lead);
 }
