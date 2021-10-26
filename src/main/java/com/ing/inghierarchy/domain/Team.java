@@ -5,6 +5,8 @@ import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @EqualsAndHashCode(exclude = {"id"})
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,5 +23,5 @@ public class Team {
     private String title;
     private String teamType; // team type ID
     private String managedBy; // management ID
-    private String[] crew; // TeamMember IDs
+    private List<String> crew; // TeamMember IDs
 }
