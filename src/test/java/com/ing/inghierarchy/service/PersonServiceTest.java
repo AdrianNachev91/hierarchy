@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 
 import static com.ing.inghierarchy.TestUtils.*;
 import static org.assertj.core.api.Assertions.*;
@@ -39,7 +40,7 @@ class PersonServiceTest {
         // Prepare
         var managerRequest = managerRequest("name", true, "manages", "corporate-id", "role-id");
         when(roleRepository.existsById("role-id")).thenReturn(true);
-        var manager = manager("name", true, "manages", "corporate-id", "role-id");
+        var manager = new ModelMapper().map(managerRequest, Manager.class);
         when(managerRepository.save(manager)).thenReturn(manager);
 
         // Test
@@ -71,7 +72,7 @@ class PersonServiceTest {
         var managerRequest = managerRequest("name", true, "manages", "corporate-id", "role-id");
         when(managerRepository.existsById("manager-id")).thenReturn(true);
         when(roleRepository.existsById("role-id")).thenReturn(true);
-        var manager = manager("name", true, "manages", "corporate-id", "role-id");
+        var manager = new ModelMapper().map(managerRequest, Manager.class);
         manager.setId("manager-id");
         when(managerRepository.save(manager)).thenReturn(manager);
 
@@ -146,7 +147,7 @@ class PersonServiceTest {
         // Prepare
         var teamMemberRequest = teamMemberRequest("name", "corporate-id", "role-id");
         when(roleRepository.existsById("role-id")).thenReturn(true);
-        var teamMember = teamMember("name", "corporate-id", "role-id");
+        var teamMember = new ModelMapper().map(teamMemberRequest, TeamMember.class);
         when(teamMemberRepository.save(teamMember)).thenReturn(teamMember);
 
         // Test
@@ -178,7 +179,7 @@ class PersonServiceTest {
         var teamMemberRequest = teamMemberRequest("name", "corporate-id", "role-id");
         when(teamMemberRepository.existsById("team-member-id")).thenReturn(true);
         when(roleRepository.existsById("role-id")).thenReturn(true);
-        var teamMember = teamMember("name", "corporate-id", "role-id");
+        var teamMember = new ModelMapper().map(teamMemberRequest, TeamMember.class);
         teamMember.setId("team-member-id");
         when(teamMemberRepository.save(teamMember)).thenReturn(teamMember);
 

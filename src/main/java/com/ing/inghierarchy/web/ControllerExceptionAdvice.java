@@ -19,7 +19,7 @@ import java.util.Map;
 
 import static org.springframework.http.HttpStatus.*;
 
-@RestControllerAdvice(assignableTypes = {PersonController.class})
+@RestControllerAdvice(assignableTypes = {PersonController.class, TeamController.class})
 public class ControllerExceptionAdvice {
 
     // Exception will always have a valid http status code

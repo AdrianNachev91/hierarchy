@@ -7,7 +7,7 @@ import com.ing.inghierarchy.repositories.ManagerRepository;
 import com.ing.inghierarchy.repositories.TeamMemberRepository;
 import com.ing.inghierarchy.service.PersonService;
 import io.swagger.v3.oas.annotations.Parameter;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -16,18 +16,12 @@ import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequestMapping("/person")
+@RequiredArgsConstructor
 public class PersonController {
 
-    private ManagerRepository managerRepository;
-    private PersonService personService;
-    private TeamMemberRepository teamMemberRepository;
-
-    @Autowired
-    public PersonController(ManagerRepository managerRepository, PersonService personService, TeamMemberRepository teamMemberRepository) {
-        this.managerRepository = managerRepository;
-        this.personService = personService;
-        this.teamMemberRepository = teamMemberRepository;
-    }
+    private final ManagerRepository managerRepository;
+    private final PersonService personService;
+    private final TeamMemberRepository teamMemberRepository;
 
     @GetMapping("/manager/{id}")
     public Manager getManager(@Parameter(name = "id", required = true) @PathVariable("id") String id) {
