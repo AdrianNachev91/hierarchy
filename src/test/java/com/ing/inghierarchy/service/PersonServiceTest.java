@@ -6,6 +6,7 @@ import com.ing.inghierarchy.domain.TeamMember;
 import com.ing.inghierarchy.repositories.ManagerRepository;
 import com.ing.inghierarchy.repositories.RoleRepository;
 import com.ing.inghierarchy.repositories.TeamMemberRepository;
+import com.ing.inghierarchy.repositories.TeamRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +14,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
+import java.util.List;
+
 import static com.ing.inghierarchy.TestUtils.*;
+import static java.util.Collections.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -28,10 +32,12 @@ class PersonServiceTest {
     private ManagerRepository managerRepository;
     @Mock
     private TeamMemberRepository teamMemberRepository;
+    @Mock
+    private TeamRepository teamRepository;
 
     @BeforeEach
     void setUp() {
-        personService = new PersonService(roleRepository, managerRepository, teamMemberRepository);
+        personService = new PersonService(roleRepository, managerRepository, teamMemberRepository, teamRepository);
     }
 
     @Test
@@ -63,6 +69,7 @@ class PersonServiceTest {
         // Verify
         assertThat(e).isInstanceOf(IngHttpException.class);
         assertThat(e.getMessage()).isEqualTo("Cannot create a manager with non-existing role");
+        assertThat(((IngHttpException)e).getHttpStatus()).isEqualTo(400);
     }
 
     @Test
@@ -96,6 +103,7 @@ class PersonServiceTest {
         // Verify
         assertThat(e).isInstanceOf(IngHttpException.class);
         assertThat(e.getMessage()).isEqualTo("Manager does not exist");
+        assertThat(((IngHttpException)e).getHttpStatus()).isEqualTo(404);
     }
 
     @Test
@@ -112,6 +120,7 @@ class PersonServiceTest {
         // Verify
         assertThat(e).isInstanceOf(IngHttpException.class);
         assertThat(e.getMessage()).isEqualTo("Cannot create a manager with non-existing role");
+        assertThat(((IngHttpException)e).getHttpStatus()).isEqualTo(400);
     }
 
     @Test
@@ -119,6 +128,7 @@ class PersonServiceTest {
 
         // Prepare
         when(managerRepository.existsById("manager-id")).thenReturn(true);
+        when(teamRepository.findAllByManagedBy("manager-id")).thenReturn(emptyList());
 
         // Test
         personService.deleteManager("manager-id");
@@ -139,6 +149,26 @@ class PersonServiceTest {
         // Verify
         assertThat(e).isInstanceOf(IngHttpException.class);
         assertThat(e.getMessage()).isEqualTo("Manager does not exist");
+        assertThat(((IngHttpException)e).getHttpStatus()).isEqualTo(404);
+    }
+
+    @Test
+    void deleteManager_NotAllowed() {
+
+        // Prepare
+        when(managerRepository.existsById("manager-id")).thenReturn(true);
+        var team1 = team("team 1", "manager-id", null);
+        var team2 = team("team 2", "manager-id", null);
+        var team3 = team("team 3", "manager-id", null);
+        when(teamRepository.findAllByManagedBy("manager-id")).thenReturn(List.of(team1, team2, team3));
+
+        // Test
+        Throwable e = catchThrowable(() -> personService.deleteManager("manager-id"));
+
+        // Verify
+        assertThat(e).isInstanceOf(IngHttpException.class);
+        assertThat(e.getMessage()).isEqualTo("Manager is a leader of the following teams: team 1, team 2, team 3. Cannot be deleted.");
+        assertThat(((IngHttpException)e).getHttpStatus()).isEqualTo(400);
     }
 
     @Test
@@ -170,6 +200,7 @@ class PersonServiceTest {
         // Verify
         assertThat(e).isInstanceOf(IngHttpException.class);
         assertThat(e.getMessage()).isEqualTo("Cannot create a team member with non-existing role");
+        assertThat(((IngHttpException)e).getHttpStatus()).isEqualTo(400);
     }
 
     @Test
@@ -203,6 +234,7 @@ class PersonServiceTest {
         // Verify
         assertThat(e).isInstanceOf(IngHttpException.class);
         assertThat(e.getMessage()).isEqualTo("Team member does not exist");
+        assertThat(((IngHttpException)e).getHttpStatus()).isEqualTo(404);
     }
 
     @Test
@@ -219,6 +251,7 @@ class PersonServiceTest {
         // Verify
         assertThat(e).isInstanceOf(IngHttpException.class);
         assertThat(e.getMessage()).isEqualTo("Cannot create a team member with non-existing role");
+        assertThat(((IngHttpException)e).getHttpStatus()).isEqualTo(400);
     }
 
     @Test
@@ -246,5 +279,24 @@ class PersonServiceTest {
         // Verify
         assertThat(e).isInstanceOf(IngHttpException.class);
         assertThat(e.getMessage()).isEqualTo("Team member does not exist");
+    }
+
+    @Test
+    void deleteTeamMember_NotAllowed() {
+
+        // Prepare
+        when(teamMemberRepository.existsById("team-member-id")).thenReturn(true);
+        var team1 = team("team 1", null, null).setCrew(List.of("team-member-id", "team-member-id2"));
+        var team2 = team("team 2", null, null).setCrew(List.of("team-member-id", "team-member-id3"));
+        var team3 = team("team 3", null, null).setCrew(List.of("team-member-id"));
+        when(teamRepository.findAllByCrewContaining("team-member-id")).thenReturn(List.of(team1, team2, team3));
+
+        // Test
+        Throwable e = catchThrowable(() -> personService.deleteTeamMember("team-member-id"));
+
+        // Verify
+        assertThat(e).isInstanceOf(IngHttpException.class);
+        assertThat(e.getMessage()).isEqualTo("Team member is a member of the following teams: team 1, team 2, team 3. Cannot be deleted.");
+        assertThat(((IngHttpException)e).getHttpStatus()).isEqualTo(400);
     }
 }

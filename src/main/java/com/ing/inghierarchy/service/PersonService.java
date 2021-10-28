@@ -2,29 +2,29 @@ package com.ing.inghierarchy.service;
 
 import com.ing.inghierarchy.Exceptions.IngHttpException;
 import com.ing.inghierarchy.domain.Manager;
+import com.ing.inghierarchy.domain.Team;
 import com.ing.inghierarchy.domain.TeamMember;
 import com.ing.inghierarchy.repositories.ManagerRepository;
 import com.ing.inghierarchy.repositories.RoleRepository;
 import com.ing.inghierarchy.repositories.TeamMemberRepository;
+import com.ing.inghierarchy.repositories.TeamRepository;
 import com.ing.inghierarchy.web.ManagerRequest;
 import com.ing.inghierarchy.web.TeamMemberRequest;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
+@RequiredArgsConstructor
 public class PersonService {
 
-    private RoleRepository roleRepository;
-    private ManagerRepository managerRepository;
-    private TeamMemberRepository teamMemberRepository;
-
-    @Autowired
-    public PersonService(RoleRepository roleRepository, ManagerRepository managerRepository, TeamMemberRepository teamMemberRepository) {
-        this.roleRepository = roleRepository;
-        this.managerRepository = managerRepository;
-        this.teamMemberRepository = teamMemberRepository;
-    }
+    private final RoleRepository roleRepository;
+    private final ManagerRepository managerRepository;
+    private final TeamMemberRepository teamMemberRepository;
+    private final TeamRepository teamRepository;
 
     public Manager createManager(ManagerRequest managerRequest) {
 
@@ -47,6 +47,12 @@ public class PersonService {
     public void deleteManager(String id) {
 
         checkManagerExists(id);
+
+        List<Team> teamsManaged = teamRepository.findAllByManagedBy(id);
+        if (!teamsManaged.isEmpty()) {
+            List<String> teamNames = teamsManaged.stream().map(Team::getTitle).collect(Collectors.toList());
+            throw IngHttpException.badRequest(String.format("Manager is a leader of the following teams: %s. Cannot be deleted.", String.join(", ", teamNames)));
+        }
 
         managerRepository.deleteById(id);
     }
@@ -73,12 +79,18 @@ public class PersonService {
 
         checkTeamMemberExists(id);
 
+        List<Team> teamsMemberOf = teamRepository.findAllByCrewContaining(id);
+        if (!teamsMemberOf.isEmpty()) {
+            List<String> teamNames = teamsMemberOf.stream().map(Team::getTitle).collect(Collectors.toList());
+            throw IngHttpException.badRequest(String.format("Team member is a member of the following teams: %s. Cannot be deleted.", String.join(", ", teamNames)));
+        }
+
         teamMemberRepository.deleteById(id);
     }
 
     private void checkRoleExists(String roleId, String s) {
         if (!roleRepository.existsById(roleId)) {
-            throw IngHttpException.forbidden(s);
+            throw IngHttpException.badRequest(s);
         }
     }
 

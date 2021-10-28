@@ -16,11 +16,7 @@ public class IngHttpException extends RuntimeException {
         return new IngHttpException(message, 404);
     }
 
-    public static IngHttpException forbidden(String message) {
-        return new IngHttpException(message, 403);
-    }
-
-    public static IngHttpException unauthorized(String message) {
-        return new IngHttpException(message, 401);
+    public static IngHttpException badRequest(String message) {
+        return new IngHttpException(message, 400);
     }
 }
