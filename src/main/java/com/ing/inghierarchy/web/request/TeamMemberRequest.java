@@ -1,4 +1,4 @@
-package com.ing.inghierarchy.web;
+package com.ing.inghierarchy.web.request;
 
 import com.ing.inghierarchy.domain.Person;
 import lombok.AllArgsConstructor;

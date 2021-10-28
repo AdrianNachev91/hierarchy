@@ -1,4 +1,4 @@
-package com.ing.inghierarchy.web;
+package com.ing.inghierarchy.web.request;
 
 import lombok.*;
 import lombok.experimental.Accessors;

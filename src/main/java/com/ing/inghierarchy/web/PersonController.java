@@ -6,6 +6,8 @@ import com.ing.inghierarchy.domain.TeamMember;
 import com.ing.inghierarchy.repositories.ManagerRepository;
 import com.ing.inghierarchy.repositories.TeamMemberRepository;
 import com.ing.inghierarchy.service.PersonService;
+import com.ing.inghierarchy.web.request.ManagerRequest;
+import com.ing.inghierarchy.web.request.TeamMemberRequest;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
