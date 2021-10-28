@@ -75,4 +75,28 @@ class TeamRepositoryTest {
                 .containsExactlyInAnyOrder("team1-id", "team2-id");
         assertThat(memberNoResults).isEmpty();
     }
+
+    @Test
+    void findAllByTeamType() {
+
+        // Prepare
+        var team1 = team("team 1", null, "teamType1").setId("team1-id");
+        var team2 = team("team 2", null, "teamType1").setId("team2-id");
+        var team3 = team("team 3", null, "teamType2").setId("team3-id");
+        teamRepository.saveAll(List.of(team1, team2, team3));
+
+        // Test
+        List<Team> teamType1Results = teamRepository.findAllByTeamType("teamType1");
+        List<Team> teamType2Results = teamRepository.findAllByTeamType("teamType2");
+        List<Team> teamTypeNoResults = teamRepository.findAllByTeamType("no-results");
+
+        // Verify
+        assertThat(teamType1Results).hasSize(2);
+        assertThat(teamType1Results.stream().map(Team::getId).collect(toList()))
+                .containsExactlyInAnyOrder("team1-id", "team2-id");
+        assertThat(teamType2Results).hasSize(1);
+        assertThat(teamType2Results.stream().map(Team::getId).collect(toList()))
+                .containsExactlyInAnyOrder("team3-id");
+        assertThat(teamTypeNoResults).isEmpty();
+    }
 }
