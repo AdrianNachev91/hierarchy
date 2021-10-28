@@ -1,9 +1,6 @@
 package com.ing.inghierarchy.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -14,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Accessors(chain = true)
 @Data
 @Document(collection = "team-types")
+@EqualsAndHashCode(exclude = {"id"})
 public class TeamType {
 
     public static final String COLLECTION_NAME = "team-types";

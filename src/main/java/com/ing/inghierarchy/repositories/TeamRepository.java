@@ -11,4 +11,5 @@ public interface TeamRepository extends MongoRepository<Team, String>, TeamRepos
 
     List<Team> findAllByManagedBy(String managedBy);
     List<Team> findAllByCrewContaining(String teamMemberId);
+    List<Team> findAllByTeamType(String teamTypeId);
 }

@@ -3,9 +3,11 @@ package com.ing.inghierarchy;
 import com.ing.inghierarchy.domain.Manager;
 import com.ing.inghierarchy.domain.Team;
 import com.ing.inghierarchy.domain.TeamMember;
+import com.ing.inghierarchy.domain.TeamType;
 import com.ing.inghierarchy.web.ManagerRequest;
 import com.ing.inghierarchy.web.TeamMemberRequest;
 import com.ing.inghierarchy.web.TeamRequest;
+import com.ing.inghierarchy.web.TeamTypeRequest;
 
 public class TestUtils {
 
@@ -35,5 +37,13 @@ public class TestUtils {
 
     public static TeamRequest teamRequest(String title, String managedBy, String teamType) {
         return TeamRequest.builder().title(title).managedBy(managedBy).teamType(teamType).build();
+    }
+
+    public static TeamType teamType(String title) {
+        return TeamType.builder().title(title).build();
+    }
+
+    public static TeamTypeRequest teamTypeRequest(String title) {
+        return TeamTypeRequest.builder().title(title).build();
     }
 }
