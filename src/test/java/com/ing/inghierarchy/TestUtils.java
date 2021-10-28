@@ -4,9 +4,9 @@ import com.ing.inghierarchy.domain.Manager;
 import com.ing.inghierarchy.domain.Team;
 import com.ing.inghierarchy.domain.TeamMember;
 import com.ing.inghierarchy.domain.TeamType;
-import com.ing.inghierarchy.web.ManagerRequest;
-import com.ing.inghierarchy.web.TeamMemberRequest;
-import com.ing.inghierarchy.web.TeamRequest;
+import com.ing.inghierarchy.web.request.ManagerRequest;
+import com.ing.inghierarchy.web.request.TeamMemberRequest;
+import com.ing.inghierarchy.web.request.TeamRequest;
 import com.ing.inghierarchy.web.TeamTypeRequest;
 
 public class TestUtils {

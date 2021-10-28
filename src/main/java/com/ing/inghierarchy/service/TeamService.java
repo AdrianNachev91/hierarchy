@@ -5,7 +5,7 @@ import com.ing.inghierarchy.domain.Team;
 import com.ing.inghierarchy.repositories.ManagerRepository;
 import com.ing.inghierarchy.repositories.TeamRepository;
 import com.ing.inghierarchy.repositories.TeamTypeRepository;
-import com.ing.inghierarchy.web.TeamRequest;
+import com.ing.inghierarchy.web.request.TeamRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
