@@ -18,7 +18,7 @@ import javax.validation.constraints.NotBlank;
 @Accessors(chain = true)
 @Data
 @CompoundIndexes({
-        @CompoundIndex(name = "corporate-id_role-id", def = "{'corporateId' : 1, 'roleId': 1}")
+        @CompoundIndex(name = "corporate-id_role-id", def = "{'corporateId' : 1, 'roleId': 1}", unique = true)
 })
 @EqualsAndHashCode(exclude = {"id"})
 public class Person {

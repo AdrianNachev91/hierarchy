@@ -3,6 +3,7 @@ package com.ing.inghierarchy.domain;
 import lombok.*;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class Team {
 
     @Id
     private String id;
+    @Indexed(unique = true)
     private String title;
     private String teamType; // team type ID
     private String managedBy; // management ID
