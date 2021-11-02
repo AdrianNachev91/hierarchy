@@ -19,6 +19,9 @@ public class Team {
 
     public static final String COLLECTION_NAME = "teams";
 
+    public static final String FIELD_MANAGED_BY = "managedBy";
+    public static final String FIELD_TEAM_TYPE = "teamType";
+
     @Id
     private String id;
     @Indexed(unique = true)

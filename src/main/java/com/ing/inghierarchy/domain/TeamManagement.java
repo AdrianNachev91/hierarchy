@@ -8,6 +8,8 @@ import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Set;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -20,5 +22,5 @@ public class TeamManagement {
 
     @Id
     private String id;
-    private String[] managerChain; // ids of managers
+    private Set<String> managerChain; // ids of managers
 }

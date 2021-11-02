@@ -4,10 +4,7 @@ import com.ing.inghierarchy.domain.Role;
 import com.ing.inghierarchy.domain.Team;
 import com.ing.inghierarchy.domain.TeamMember;
 import com.ing.inghierarchy.domain.TeamType;
-import com.ing.inghierarchy.repositories.RoleRepository;
-import com.ing.inghierarchy.repositories.TeamMemberRepository;
-import com.ing.inghierarchy.repositories.TeamRepository;
-import com.ing.inghierarchy.repositories.TeamTypeRepository;
+import com.ing.inghierarchy.repositories.*;
 import com.ing.inghierarchy.service.PersonService;
 import com.ing.inghierarchy.service.RoleService;
 import com.ing.inghierarchy.service.TeamService;
@@ -16,87 +13,47 @@ import com.ing.inghierarchy.service.TeamTypeService;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
+@RequiredArgsConstructor
 public class DataLoader implements ApplicationRunner {
 
-	private RoleRepository roleRepo;
-	private TeamMemberRepository memberRepo;
-	private TeamTypeRepository teamTypeRepository;
-	private TeamRepository teamRepository;
-	
-	@Autowired
-    public DataLoader(RoleRepository roleRepo, TeamMemberRepository memberRepo, TeamTypeRepository teamTypeRepository, TeamRepository teamRepository){
-		this.roleRepo = roleRepo;
-		this.memberRepo = memberRepo;
-		this.teamTypeRepository = teamTypeRepository;
-		this.teamRepository = teamRepository;
-    }
+	private final RoleRepository roleRepo;
+	private final TeamMemberRepository memberRepo;
+	private final TeamTypeRepository teamTypeRepository;
+	private final TeamRepository teamRepository;
+	private final ManagerRepository managerRepository;
+	private final TeamManagementRepository teamManagementRepository;
 	
 	@Override
-	public void run(ApplicationArguments args) throws Exception {
-		Role roleDev = Role.builder()
-				.title("Developer")
-				.build();
-		Role roleOps = Role.builder()
-				.title("Ops")
-				.build();
-		Role roleCJE = Role.builder()
-				.title("Customer Journey Expert")
-				.build();
-		Role rolePO = Role.builder()
-				.title("Product Owner")
-				.build();
-		roleDev = this.roleRepo.save(roleDev);
-		roleOps = this.roleRepo.save(roleOps);
-		roleCJE = this.roleRepo.save(roleCJE);
-		rolePO = this.roleRepo.save(rolePO);
-		
-		System.out.println(String.format("Role-ids: %s, %s, %s, %s", roleDev.getId(), roleOps.getId(), roleCJE.getId(), rolePO.getId()));
-
-		TeamMember member1 = TeamMember.builder()
-				.corporateId("100001")
-				.name("Member One")
-				.roleId(roleCJE.getId())
-				.build();
-		TeamMember member2 = TeamMember.builder()
-				.corporateId("100002")
-				.name("Member Two")
-				.roleId(roleDev.getId())
-				.build();
-		TeamMember member3 = TeamMember.builder()
-				.corporateId("100002")
-				.name("PO of team")
-				.roleId(rolePO.getId())
-				.build();
-		member1 = this.memberRepo.save(member1);
-		member2 = this.memberRepo.save(member2);
-		member3 = this.memberRepo.save(member3);
-		
-		System.out.println(String.format("Member-ids: %s, %s, %s", member1.getId(), member2.getId(), member3.getId()));
-		
-		TeamType teamType1 = TeamType.builder()
-				.title("devgroup")
-				.build();
-		teamType1 = this.teamTypeRepository.save(teamType1);
-		
-		System.out.println(String.format("TeamType-ids: %s", teamType1.getId()));
-		
-		List<String> teamMemberIds = new ArrayList<String>();
-		teamMemberIds.add(member1.getId());
-		teamMemberIds.add(member2.getId());
-		Team team = Team.builder()
-				.managedBy(member3.getId())
-				.crew(teamMemberIds)
-				.title("hiearchies-team")
-				.build();
-		team = teamRepository.save(team);
-		
-		System.out.println(String.format("Team-ids: %s", team.getId()));
+	public void run(ApplicationArguments args) {
+		Role roleDeptManager = roleRepo.save(Role.builder().title("Department Manager").build());
+		Role roleManagementSupport = roleRepo.save(Role.builder().title("Management Support").build());
+		Role roleBusinessManager = roleRepo.save(Role.builder().title("Business Manager").build());
+		Role roleChapterLead = roleRepo.save(Role.builder().title("Chapter Lead").build());
+		Role roleCDFront = roleRepo.save(Role.builder().title("CD Front").build());
+		Role roleCDServices = roleRepo.save(Role.builder().title("CD Services").build());
+		Role roleCDStack = roleRepo.save(Role.builder().title("CD Stack").build());
+		Role roleKYCAnalytics = roleRepo.save(Role.builder().title("KYC Analytics").build());
+		Role roleKYCServicesFront = roleRepo.save(Role.builder().title("KYC Services Front").build());
+		Role roleKYCStackMonitoringAndQA = roleRepo.save(Role.builder().title("KYC Stack Monitoring and QA").build());
+		Role roleKYCWorkflow = roleRepo.save(Role.builder().title("KYC Workflow").build());
+		Role roleOnboardingFront = roleRepo.save(Role.builder().title("Onboarding Front").build());
+		Role roleContentDelivery = roleRepo.save(Role.builder().title("Content Delivery").build());
+		Role roleArchiving = roleRepo.save(Role.builder().title("Archiving").build());
+		Role roleIntelligentAutomation = roleRepo.save(Role.builder().title("Intelligent Automation").build());
+		Role roleDataProcessingAndOps = roleRepo.save(Role.builder().title("Data Processing & Ops").build());
+		Role roleMLEngineer = roleRepo.save(Role.builder().title("Machine Learning Engineer").build());
+		Role roleInsightsAndDataServing = roleRepo.save(Role.builder().title("Insights And Data Serving").build());
+		Role roleDataWrangling = roleRepo.save(Role.builder().title("Data Wrangling").build());
+		Role roleAnalyticalReposting = roleRepo.save(Role.builder().title("Analytical Reporting And Tools").build());
+		Role roleBackendDev = roleRepo.save(Role.builder().title("Backend Developer").build());
+		Role roleFrontendDev = roleRepo.save(Role.builder().title("Frontend Developer").build());
+		Role roleOps = roleRepo.save(Role.builder().title("Ops").build());
 	}
-
 }

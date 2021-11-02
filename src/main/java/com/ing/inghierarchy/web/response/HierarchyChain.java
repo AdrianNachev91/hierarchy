@@ -11,6 +11,6 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Builder
 @Accessors(chain = true)
-public class ManagementChain {
+public class HierarchyChain {
     private ManagerResponse manager;
 }

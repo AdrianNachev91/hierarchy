@@ -12,5 +12,7 @@ import lombok.experimental.Accessors;
 @Builder
 @Accessors(chain = true)
 public class HierarchyStructureResponse {
-    private ManagementChain managementChain;
+    private HierarchyChain hierarchyChain;
+    private String previous; // link to previous set of teams
+    private String next; // link to next set of teams
 }
