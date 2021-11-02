@@ -1,13 +1,12 @@
 package com.ing.inghierarchy;
 
-import com.ing.inghierarchy.domain.Manager;
-import com.ing.inghierarchy.domain.Team;
-import com.ing.inghierarchy.domain.TeamMember;
-import com.ing.inghierarchy.domain.TeamType;
-import com.ing.inghierarchy.web.request.ManagerRequest;
-import com.ing.inghierarchy.web.request.TeamMemberRequest;
+import com.ing.inghierarchy.domain.*;
+import com.ing.inghierarchy.web.request.EmployeeRequest;
 import com.ing.inghierarchy.web.request.TeamRequest;
 import com.ing.inghierarchy.web.TeamTypeRequest;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class TestUtils {
 
@@ -15,20 +14,12 @@ public class TestUtils {
         return singleQuotedJson.replaceAll("'", "\"");
     }
 
-    public static Manager manager(String name, boolean lead, String manages, String corporateId, String roleId) {
-        return Manager.builder().name(name).lead(lead).manages(manages).corporateId(corporateId).roleId(roleId).build();
+    public static Employee employee(String name, String corporateId, String roleId) {
+        return Employee.builder().name(name).corporateId(corporateId).roleId(roleId).build();
     }
 
-    public static ManagerRequest managerRequest(String name, boolean lead, String manages, String corporateId, String roleId) {
-        return ManagerRequest.builder().name(name).lead(lead).manages(manages).corporateId(corporateId).roleId(roleId).build();
-    }
-
-    public static TeamMember teamMember(String name, String corporateId, String roleId) {
-        return TeamMember.builder().name(name).corporateId(corporateId).roleId(roleId).build();
-    }
-
-    public static TeamMemberRequest teamMemberRequest(String name, String corporateId, String roleId) {
-        return TeamMemberRequest.builder().name(name).corporateId(corporateId).roleId(roleId).build();
+    public static EmployeeRequest employeeRequest(String name, String corporateId, String roleId) {
+        return EmployeeRequest.builder().name(name).corporateId(corporateId).roleId(roleId).build();
     }
 
     public static Team team(String title, String managedBy, String teamType) {
@@ -45,5 +36,13 @@ public class TestUtils {
 
     public static TeamTypeRequest teamTypeRequest(String title) {
         return TeamTypeRequest.builder().title(title).build();
+    }
+
+    public static ManagementChain managementChain(boolean attachedToTeam, Set<ManagementChain.ManagerInChain> managementChains) {
+        return ManagementChain.builder().attachedToTeam(attachedToTeam).managersChain(new HashSet<>(managementChains)).build();
+    }
+
+    public static ManagementChain.ManagerInChain managerInChain(String managerId, String managesId) {
+        return ManagementChain.ManagerInChain.builder().managerId(managerId).manages(managesId).build();
     }
 }

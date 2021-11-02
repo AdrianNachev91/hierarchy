@@ -2,7 +2,7 @@ package com.ing.inghierarchy.service;
 
 import com.ing.inghierarchy.Exceptions.IngHttpException;
 import com.ing.inghierarchy.domain.Team;
-import com.ing.inghierarchy.repositories.ManagerRepository;
+import com.ing.inghierarchy.repositories.ManagementChainRepository;
 import com.ing.inghierarchy.repositories.TeamRepository;
 import com.ing.inghierarchy.repositories.TeamTypeRepository;
 import com.ing.inghierarchy.web.request.TeamRequest;
@@ -14,23 +14,24 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TeamService {
 
-    private final ManagerRepository managerRepository;
+    private final ManagementChainRepository managementChainRepository;
     private final TeamTypeRepository teamTypeRepository;
     private final TeamRepository teamRepository;
 
     public Team createTeam(TeamRequest teamRequest) {
 
-        checkManagerExists(teamRequest.getManagedBy());
+        checkManagementChainExist(teamRequest.getManagedBy());
         checkTeamTypeExists(teamRequest.getTeamType());
 
-        Team team = new ModelMapper().map(teamRequest, Team.class);
-        return teamRepository.save(team);
+        Team team = teamRepository.save(new ModelMapper().map(teamRequest, Team.class));
+        managementChainRepository.updateAttachedToTeam(teamRequest.getManagedBy(), true);
+        return team;
     }
 
     public Team updateTeam(String id, TeamRequest teamRequest) {
 
         checkTeamExists(id);
-        checkManagerExists(teamRequest.getManagedBy());
+        checkManagementChainExist(teamRequest.getManagedBy());
         checkTeamTypeExists(teamRequest.getTeamType());
 
         Team team = new ModelMapper().map(teamRequest, Team.class);
@@ -46,9 +47,9 @@ public class TeamService {
         teamRepository.deleteById(id);
     }
 
-    private void checkManagerExists(String managedBy) {
-        if (!managerRepository.existsByIdAndLead(managedBy, true)) {
-            throw IngHttpException.notFound("Manager not found");
+    private void checkManagementChainExist(String managedBy) {
+        if (!managementChainRepository.existsById(managedBy)) {
+            throw IngHttpException.notFound("Management chain not found");
         }
     }
 

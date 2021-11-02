@@ -20,10 +20,9 @@ public class HierarchyService {
 
     private final TeamRepository teamRepository;
     private final TeamTypeRepository teamTypeRepository;
-    private final TeamManagementRepository teamManagementRepository;
+    private final ManagementChainRepository teamManagementRepository;
     private final RoleRepository roleRepository;
-    private final ManagerRepository managerRepository;
-    private final TeamMemberRepository teamMemberRepository;
+    private final EmployeeRepository employeeRepository;
     private final HierarchyProperties hierarchyProperties;
 
     public HierarchyStructureResponse getHierarchy(String teamTypeTitle, int limit, long offset) {
@@ -48,7 +47,8 @@ public class HierarchyService {
         var hierarchyStructureResponse = HierarchyStructureResponse.builder().build();
 
         Set<String> teamManagementsToFetch = teams.stream().map(Team::getManagedBy).collect(toSet());
-        List<TeamManagement> teamManagements = teamManagementRepository.findAllByIdIn(teamManagementsToFetch);
+        List<ManagementChain> teamManagements = teamManagementRepository.findAllByIdIn(teamManagementsToFetch);
+        teamManagements.addAll(teamManagementRepository.findAllByAttachedToTeam(false)); // Always see chains that have no teams
 
         var hierarchyChain = new HierarchyChain();
         hierarchyStructureResponse
@@ -56,24 +56,24 @@ public class HierarchyService {
                 .setPrevious(previous)
                 .setNext(next);
 
-        for (TeamManagement teamManagement : teamManagements) {
-            // todo Ascertain that all managers in chain exist
-            List<Manager> managers = managerRepository.findAllByIdIn(teamManagement.getManagerChain());
+        for (ManagementChain teamManagement : teamManagements) {
             ManagerResponse previousManagerResponse = null;
-            Manager currentManager = getFirstInChain(teamManagement, managers).orElseThrow(() ->
+            ManagementChain.ManagerInChain currentManager = getFirstInChain(teamManagement).orElseThrow(() ->
                     IngHttpException.badRequest("There is no first in chain for management chain: " + teamManagement.getId()));
             boolean firstInChain = true;
 
-            while (teamManagement.getManagerChain().contains(currentManager.getManages())) {
+            while (notLastInChain(teamManagement, currentManager)) {
+                Employee currentManagerDetails = employeeRepository.findById(currentManager.getManagerId()).orElseThrow(() ->
+                        IngHttpException.notFound("Employee not found"));
                 ManagerResponse managerResponse;
                 if (firstInChain && hierarchyChain.getManager() != null) {
                     managerResponse = hierarchyChain.getManager(); // switch to already existing manager, assumption is that first in chain will always be the same for each chain
                 } else {
                     managerResponse = new ManagerResponse();
-                    managerResponse.setId(currentManager.getId());
-                    managerResponse.setCorporateId(currentManager.getCorporateId());
-                    managerResponse.setName(currentManager.getName());
-                    managerResponse.setRole(roleRepository.findById(currentManager.getRoleId()).orElse(Role.builder().title("Not assigned").build()).getTitle());
+                    managerResponse.setId(currentManagerDetails.getId());
+                    managerResponse.setCorporateId(currentManagerDetails.getCorporateId());
+                    managerResponse.setName(currentManagerDetails.getName());
+                    managerResponse.setRole(roleRepository.findById(currentManagerDetails.getRoleId()).orElse(Role.builder().title("Not assigned").build()).getTitle());
 
                     if (hierarchyChain.getManager() == null) {
                         hierarchyChain.setManager(managerResponse);
@@ -85,25 +85,27 @@ public class HierarchyService {
                     previousManagerResponse.getManages().add(managerResponse);
                 }
                 previousManagerResponse = managerResponse;
-                currentManager = managers.stream().filter(m -> m.getId().equals(manages)).findFirst().orElseThrow(() ->
+                currentManager = teamManagement.getManagersChain().stream().filter(m -> m.getManagerId().equals(manages)).findFirst().orElseThrow(() ->
                         IngHttpException.badRequest("Broken link in management chain: " + teamManagement.getId()));
                 hierarchyChain.setManager(managerResponse);
                 firstInChain = false;
             }
 
-            // By this point currentManager is set to the team lead
+            // By this point currentManager is set to the team lead or last manager in the chain
+            Employee currentManagerDetails = employeeRepository.findById(currentManager.getManagerId()).orElseThrow(() ->
+                    IngHttpException.notFound("Employee not found"));
             var managerResponse = new ManagerResponse();
-            managerResponse.setId(currentManager.getId());
-            managerResponse.setCorporateId(currentManager.getCorporateId());
-            managerResponse.setName(currentManager.getName());
-            managerResponse.setRole(roleRepository.findById(currentManager.getRoleId()).orElse(Role.builder().title("Not assigned").build()).getTitle());
+            managerResponse.setId(currentManagerDetails.getId());
+            managerResponse.setCorporateId(currentManagerDetails.getCorporateId());
+            managerResponse.setName(currentManagerDetails.getName());
+            managerResponse.setRole(roleRepository.findById(currentManagerDetails.getRoleId()).orElse(Role.builder().title("Not assigned").build()).getTitle());
             List<Team> teamsManaged = teams.stream().filter(t -> t.getManagedBy().equals(teamManagement.getId())).collect(toList());
             for(Team team : teamsManaged) {
                 var teamResponse = new TeamResponse();
                 teamResponse.setId(team.getId());
                 teamResponse.setTitle(team.getTitle());
                 for (String teamMemberId : team.getCrew()) {
-                    TeamMember teamMember = teamMemberRepository.findById(teamMemberId).orElse(null);
+                    Employee teamMember = employeeRepository.findById(teamMemberId).orElse(null);
                     if (teamMember != null) {
                         var teamMemberResponse = new TeamMemberResponse();
                         teamMemberResponse.setId(teamMember.getId());
@@ -122,17 +124,21 @@ public class HierarchyService {
         return null;
     }
 
-    private Optional<Manager> getFirstInChain(TeamManagement teamManagement, List<Manager> managers) {
+    private boolean notLastInChain(ManagementChain teamManagement, ManagementChain.ManagerInChain currentManager) {
+        return teamManagement.getManagersChain().stream().map(ManagementChain.ManagerInChain::getManagerId).collect(toSet()).contains(currentManager.getManages());
+    }
+
+    private Optional<ManagementChain.ManagerInChain> getFirstInChain(ManagementChain teamManagement) {
         // todo Check if there is no more than 1 first in chain
-        for (Manager manager : managers) {
-            if (isNotManagedByAnyone(teamManagement, manager)) {
-                return Optional.of(manager);
+        for (ManagementChain.ManagerInChain managerInChain : teamManagement.getManagersChain()) {
+            if (isNotManagedByAnyone(teamManagement, managerInChain)) {
+                return Optional.of(managerInChain);
             }
         }
         return Optional.empty();
     }
 
-    private boolean isNotManagedByAnyone(TeamManagement teamManagement, Manager manager) {
-        return !teamManagement.getManagerChain().contains(manager.getManages());
+    private boolean isNotManagedByAnyone(ManagementChain teamManagement, ManagementChain.ManagerInChain managerInChain) {
+        return !teamManagement.getManagersChain().stream().map(ManagementChain.ManagerInChain::getManages).collect(toSet()).contains(managerInChain.getManagerId());
     }
 }
