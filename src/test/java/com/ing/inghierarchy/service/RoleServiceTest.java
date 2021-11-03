@@ -1,5 +1,6 @@
 package com.ing.inghierarchy.service;
 
+import static java.util.Collections.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.ing.inghierarchy.domain.Employee;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,12 +18,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.ing.inghierarchy.Exceptions.IngHttpException;
-import com.ing.inghierarchy.domain.Manager;
 import com.ing.inghierarchy.domain.Role;
-import com.ing.inghierarchy.domain.TeamMember;
-import com.ing.inghierarchy.repositories.ManagerRepository;
+import com.ing.inghierarchy.repositories.EmployeeRepository;
 import com.ing.inghierarchy.repositories.RoleRepository;
-import com.ing.inghierarchy.repositories.TeamMemberRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class RoleServiceTest {
@@ -30,13 +29,11 @@ public class RoleServiceTest {
     @Mock
     private RoleRepository roleRepository;
     @Mock
-    private TeamMemberRepository teamMemberRepository;
-    @Mock
-    private ManagerRepository managerRepository;
+    private EmployeeRepository employeeRepository;
     
     @BeforeEach
     void setUp() {
-    	roleService = new RoleService(roleRepository, teamMemberRepository, managerRepository);
+    	roleService = new RoleService(roleRepository, employeeRepository);
     }
     
     
@@ -83,29 +80,27 @@ public class RoleServiceTest {
     @Test
     void updateRole_found() {
     	var role = Role.builder().title("role").build();
-    	var updateRole = role;
-    	updateRole.setTitle("updated-role");
+		role.setTitle("updated-role");
     	when(roleRepository.findById(role.getId())).thenReturn(Optional.of(role));
-    	when(roleRepository.save(role)).thenReturn(updateRole);
+    	when(roleRepository.save(role)).thenReturn(role);
     	
     	Role updatedRole = null;
     	try {
-			updatedRole = roleService.updateRole(role.getId(), updateRole);
+			updatedRole = roleService.updateRole(role.getId(), role);
 		} catch (Exception e) {
 			//not expected
 		}
     	
-    	assertThat(updatedRole).isEqualTo(updateRole);
+    	assertThat(updatedRole).isEqualTo(role);
     }
     
     @Test
     void updateRole_notfound() {
     	var role = Role.builder().title("role").build();
-    	var updateRole = role;
-    	updateRole.setTitle("updated-role");
+		role.setTitle("updated-role");
     	when(roleRepository.findById(role.getId())).thenReturn(Optional.empty());
     	
-    	Throwable e = catchThrowable(() ->  roleService.updateRole(role.getId(), updateRole));
+    	Throwable e = catchThrowable(() ->  roleService.updateRole(role.getId(), role));
 		
     	
     	assertThat(e.getMessage()).isEqualTo("No Role found to update");
@@ -125,16 +120,10 @@ public class RoleServiceTest {
     void deleteRole_found() {
     	var role = Role.builder().id("1").title("role").build();
 
-    	when(managerRepository.findByRoleId(role.getId())).thenReturn(new ArrayList<Manager>());
-    	when(teamMemberRepository.findByRoleId(role.getId())).thenReturn(new ArrayList<TeamMember>());
-    	when(roleRepository.findById(role.getId())).thenReturn(Optional.of(role), Optional.empty());
+    	when(employeeRepository.findByRoleId(role.getId())).thenReturn(emptyList());
+    	when(roleRepository.findById(role.getId())).thenReturn(Optional.of(role));
     	
-    	boolean deleted = false;
-    	try {
-			deleted = roleService.deleteRole(role.getId());
-		} catch (Exception e) {
-			//not expected
-		}
+    	boolean deleted = roleService.deleteRole(role.getId());
     	
     	assertThat(deleted).isEqualTo(true);
     }
@@ -142,11 +131,10 @@ public class RoleServiceTest {
     @Test
     void deleteRole_found_deletionFailed() {
     	var role = Role.builder().id("1").title("role").build();
-    	List<Manager> managerList = new ArrayList<Manager>();
-    	managerList.add(Manager.builder().roleId(role.getId()).build());
+    	List<Employee> managerList = new ArrayList<>();
+    	managerList.add(Employee.builder().roleId(role.getId()).build());
     	
-    	when(managerRepository.findByRoleId(role.getId())).thenReturn(managerList);
-    	when(teamMemberRepository.findByRoleId(role.getId())).thenReturn(new ArrayList<TeamMember>());
+    	when(employeeRepository.findByRoleId(role.getId())).thenReturn(managerList);
     	when(roleRepository.findById(role.getId())).thenReturn(Optional.of(role));
     	
     	Throwable e = catchThrowable(() ->  roleService.deleteRole(role.getId()));

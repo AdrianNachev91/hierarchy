@@ -3,3 +3,4 @@ spring:
     mongodb:
       port: 27018
       database: hierarchies
+

@@ -1,32 +1,23 @@
 package com.ing.inghierarchy.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import com.ing.inghierarchy.Exceptions.IngHttpException;
 import com.ing.inghierarchy.domain.Role;
 import com.ing.inghierarchy.repositories.RoleRepository;
-import com.ing.inghierarchy.repositories.TeamMemberRepository;
-import com.ing.inghierarchy.repositories.ManagerRepository;
+import com.ing.inghierarchy.repositories.EmployeeRepository;
 
 @Service
+@RequiredArgsConstructor
 public class RoleService {
 	
-	private RoleRepository roleRepository;
-	private TeamMemberRepository teamMemberRepository;
-	private ManagerRepository managerRepository;
-	
-	@Autowired
-	public RoleService(RoleRepository roleRepository, TeamMemberRepository teamMemberRepository, ManagerRepository managerRepository)
-	{
-		this.roleRepository = roleRepository;
-		this.teamMemberRepository = teamMemberRepository;
-		this.managerRepository = managerRepository;
-	}
+	private final RoleRepository roleRepository;
+	private final EmployeeRepository employeeRepository;
 	
 	public Role createRole(Role role) throws IngHttpException
 	{
-		Role returnRole = null;
+		Role returnRole;
 		if(!roleExists(role)) {
 			returnRole = Role.builder()
 					.title(role.getTitle())
@@ -55,13 +46,7 @@ public class RoleService {
 	
 	public boolean deleteRole(String id) throws IngHttpException  {
 		Role deleteRole = roleRepository.findById(id).orElseThrow(() -> IngHttpException.notFound("No Role found to delete"));
-		boolean canDelete = true;
-		if(!teamMemberRepository.findByRoleId(deleteRole.getId()).isEmpty()) {
-			canDelete = false;
-		}
-		if(!managerRepository.findByRoleId(deleteRole.getId()).isEmpty()) {
-			canDelete = false;
-		}
+		boolean canDelete = employeeRepository.findByRoleId(deleteRole.getId()).isEmpty();
 		if(canDelete) {
 			roleRepository.delete(deleteRole);
 		} else {
@@ -78,7 +63,7 @@ public class RoleService {
 		boolean exists = false;
 		if(role.getId() != null) {
 			if(!role.getId().isEmpty()) {
-				exists = !roleRepository.findById(role.getId()).isEmpty();
+				exists = roleRepository.findById(role.getId()).isPresent();
 			}
 		}
 		

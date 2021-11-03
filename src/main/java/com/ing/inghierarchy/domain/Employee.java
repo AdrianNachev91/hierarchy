@@ -1,5 +1,6 @@
 package com.ing.inghierarchy.domain;
 
+import com.ing.inghierarchy.web.request.EmployeeRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -9,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 
@@ -18,10 +20,11 @@ import javax.validation.constraints.NotBlank;
 @Accessors(chain = true)
 @Data
 @CompoundIndexes({
-        @CompoundIndex(name = "corporate-id_role-id", def = "{'corporateId' : 1, 'roleId': 1}")
+        @CompoundIndex(name = "corporate-id_role-id", def = "{'corporateId' : 1, 'roleId': 1}", unique = true)
 })
 @EqualsAndHashCode(exclude = {"id"})
-public class Person {
+@Document(collection = "employees")
+public class Employee {
     @Id
     private String id;
     @NotBlank
