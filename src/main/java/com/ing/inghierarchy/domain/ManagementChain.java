@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -27,7 +28,7 @@ public class ManagementChain {
     @Id
     private String id;
     private boolean attachedToTeam; // Whether the chain leads to a team or not, false by default
-    private Set<ManagerInChain> managersChain; // ids of managers
+    private Set<ManagerInChain> managersChain;
 
     @NoArgsConstructor
     @AllArgsConstructor
@@ -35,6 +36,7 @@ public class ManagementChain {
     @Accessors(chain = true)
     @Data
     public static class ManagerInChain {
+        @NotBlank
         private String managerId;
         private String manages; // null when last of the chain
     }

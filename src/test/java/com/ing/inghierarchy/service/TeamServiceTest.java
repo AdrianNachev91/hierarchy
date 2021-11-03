@@ -12,6 +12,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
+import java.util.Optional;
+
 import static com.ing.inghierarchy.TestUtils.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -91,10 +93,10 @@ class TeamServiceTest {
 
         // Prepare
         var teamRequest = teamRequest("Team name", "managedBy-id", "teamType-id");
-        when(teamRepository.existsById("team-id")).thenReturn(true);
         when(managementChainRepository.existsById("managedBy-id")).thenReturn(true);
         when(teamTypeRepository.existsById("teamType-id")).thenReturn(true);
         var team = new ModelMapper().map(teamRequest, Team.class);
+        when(teamRepository.findById("team-id")).thenReturn(Optional.of(team));
         when(teamRepository.save(team)).thenReturn(team.setId("team-id"));
 
         // Test
@@ -109,7 +111,9 @@ class TeamServiceTest {
 
         // Prepare
         var teamRequest = teamRequest("Team name", "managedBy-id", "teamType-id");
-        when(teamRepository.existsById("team-id")).thenReturn(false);
+        when(managementChainRepository.existsById("managedBy-id")).thenReturn(true);
+        when(teamTypeRepository.existsById("teamType-id")).thenReturn(true);
+        when(teamRepository.findById("team-id")).thenReturn(Optional.empty());
 
         // Test
         Throwable e = catchThrowable(() -> teamService.updateTeam("team-id", teamRequest));
@@ -118,7 +122,6 @@ class TeamServiceTest {
         assertThat(e).isInstanceOf(IngHttpException.class);
         assertThat(((IngHttpException)e).getHttpStatus()).isEqualTo(404);
         assertThat(e.getMessage()).isEqualTo("Team does not exist");
-        verify(teamTypeRepository, never()).existsById(anyString());
         verify(teamRepository, never()).save(any(Team.class));
     }
 
@@ -127,7 +130,6 @@ class TeamServiceTest {
 
         // Prepare
         var teamRequest = teamRequest("Team name", "managedBy-id", "teamType-id");
-        when(teamRepository.existsById("team-id")).thenReturn(true);
         when(managementChainRepository.existsById("managedBy-id")).thenReturn(false);
 
         // Test
@@ -146,7 +148,6 @@ class TeamServiceTest {
 
         // Prepare
         var teamRequest = teamRequest("Team name", "managedBy-id", "teamType-id");
-        when(teamRepository.existsById("team-id")).thenReturn(true);
         when(managementChainRepository.existsById("managedBy-id")).thenReturn(true);
         when(teamTypeRepository.existsById("teamType-id")).thenReturn(false);
 

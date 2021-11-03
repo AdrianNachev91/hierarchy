@@ -39,8 +39,8 @@ public class HierarchyService {
 
         TeamType teamType = teamTypeRepository.findFirstByTitle(teamTypeTitle).orElseThrow(() -> IngHttpException.notFound("Team type not found"));
 
-        String previous = offset != 0 ? String.format("%s/hierarchy/%s/%d/%d", teamTypeTitle, hierarchyProperties.getDomain(), limit, offset - limit) : null;
-        String next = offset + limit <= totalNrTeams ? String.format("%s/hierarchy/%s/%d/%d", teamTypeTitle, hierarchyProperties.getDomain(), limit, offset + limit) : null;
+        String previous = offset != 0 ? String.format("%s/hierarchy/%s/%d/%d", hierarchyProperties.getDomain(), teamTypeTitle, limit, offset - limit) : null;
+        String next = offset + limit < totalNrTeams ? String.format("%s/hierarchy/%s/%d/%d", hierarchyProperties.getDomain(), teamTypeTitle, limit, offset + limit) : null;
 
         List<Team> teams = teamRepository.fetchTeamsWithPaginationByTeamType(teamType.getId(), limit, offset);
 
@@ -99,11 +99,15 @@ public class HierarchyService {
             managerResponse.setCorporateId(currentManagerDetails.getCorporateId());
             managerResponse.setName(currentManagerDetails.getName());
             managerResponse.setRole(roleRepository.findById(currentManagerDetails.getRoleId()).orElse(Role.builder().title("Not assigned").build()).getTitle());
+            if (previousManagerResponse != null) {
+                previousManagerResponse.getManages().add(managerResponse);
+            }
             List<Team> teamsManaged = teams.stream().filter(t -> t.getManagedBy().equals(teamManagement.getId())).collect(toList());
             for(Team team : teamsManaged) {
                 var teamResponse = new TeamResponse();
                 teamResponse.setId(team.getId());
                 teamResponse.setTitle(team.getTitle());
+                teamResponse.setTeamType(teamTypeRepository.findById(team.getTeamType()).orElse(TeamType.builder().title("Not assigned").build()).getTitle());
                 for (String teamMemberId : team.getCrew()) {
                     Employee teamMember = employeeRepository.findById(teamMemberId).orElse(null);
                     if (teamMember != null) {
@@ -119,9 +123,7 @@ public class HierarchyService {
             }
         }
 
-
-
-        return null;
+        return hierarchyStructureResponse;
     }
 
     private boolean notLastInChain(ManagementChain teamManagement, ManagementChain.ManagerInChain currentManager) {

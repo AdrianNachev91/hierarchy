@@ -30,12 +30,14 @@ public class TeamService {
 
     public Team updateTeam(String id, TeamRequest teamRequest) {
 
-        checkTeamExists(id);
         checkManagementChainExist(teamRequest.getManagedBy());
         checkTeamTypeExists(teamRequest.getTeamType());
 
-        Team team = new ModelMapper().map(teamRequest, Team.class);
-        team.setId(id);
+        Team team = teamRepository.findById(id).orElseThrow(() ->
+                IngHttpException.notFound("Team does not exist"));
+        team.setTeamType(teamRequest.getTeamType());
+        team.setTitle(teamRequest.getTitle());
+        team.setManagedBy(teamRequest.getManagedBy());
 
         return teamRepository.save(team);
     }
