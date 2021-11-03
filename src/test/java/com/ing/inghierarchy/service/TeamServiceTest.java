@@ -2,6 +2,7 @@ package com.ing.inghierarchy.service;
 
 import com.ing.inghierarchy.Exceptions.IngHttpException;
 import com.ing.inghierarchy.domain.Team;
+import com.ing.inghierarchy.repositories.EmployeeRepository;
 import com.ing.inghierarchy.repositories.ManagementChainRepository;
 import com.ing.inghierarchy.repositories.TeamRepository;
 import com.ing.inghierarchy.repositories.TeamTypeRepository;
@@ -29,10 +30,12 @@ class TeamServiceTest {
     private TeamTypeRepository teamTypeRepository;
     @Mock
     private TeamRepository teamRepository;
+    @Mock
+    private EmployeeRepository employeeRepository;
 
     @BeforeEach
     void setUp() {
-        teamService = new TeamService(managementChainRepository, teamTypeRepository, teamRepository);
+        teamService = new TeamService(managementChainRepository, teamTypeRepository, teamRepository, employeeRepository);
     }
 
     @Test

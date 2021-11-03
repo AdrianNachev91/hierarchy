@@ -1,7 +1,6 @@
 package com.ing.inghierarchy;
 
 import com.ing.inghierarchy.domain.*;
-import com.ing.inghierarchy.repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -14,21 +13,12 @@ import org.springframework.data.mongodb.core.index.IndexResolver;
 import org.springframework.data.mongodb.core.index.MongoPersistentEntityIndexResolver;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Set;
-
 @Component
 @RequiredArgsConstructor
 public class ApplicationReadyListener {
 
     private final MongoTemplate mongoTemplate;
     private final MongoConverter mongoConverter;
-
-//    private final RoleRepository roleRepo;
-//    private final TeamTypeRepository teamTypeRepository;
-//    private final TeamRepository teamRepository;
-//    private final EmployeeRepository employeeRepository;
-//    private final ManagementChainRepository managementChainRepository;
 
     @EventListener(ApplicationReadyEvent.class)
     public void initIndicesAfterStartup() {
