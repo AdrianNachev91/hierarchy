@@ -29,5 +29,6 @@ public class Team {
     private String title;
     private String teamType; // team type ID
     private String managedBy; // management ID
+    private String leadId;
     private List<String> crew = new ArrayList<>(); // TeamMember IDs
 }

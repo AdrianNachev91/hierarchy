@@ -9,6 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
+import java.util.HashSet;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -28,7 +29,8 @@ public class ManagementChain {
     @Id
     private String id;
     private boolean attachedToTeam; // Whether the chain leads to a team or not, false by default
-    private Set<ManagerInChain> managersChain;
+    @Builder.Default
+    private Set<ManagerInChain> managersChain = new HashSet<>();
 
     @NoArgsConstructor
     @AllArgsConstructor

@@ -161,17 +161,21 @@ class EmployeeServiceTest {
                 Set.of(managerInChain("employee-id", null))
         ).setId("chain2");
         when(managementChainRepository.findAllByEmployeeId("employee-id")).thenReturn(List.of(chain1, chain2));
-        var team1 = team("team 1", null, null).setCrew(List.of("employee-id", "e2", "e3"));
-        var team2 = team("team 2", null, null).setCrew(List.of("e4", "e5", "employee-id"));
-        var team3 = team("team 3", null, null).setCrew(List.of("e4", "employee-id", "e1"));
+        var team1 = team("team 1", null, "employee-id", null).setCrew(List.of("employee-id", "e2", "e3"));
+        var team2 = team("team 2", null, null, null).setCrew(List.of("e4", "e5", "employee-id"));
+        var team3 = team("team 3", null, "employee-id", null).setCrew(List.of("e4", "employee-id", "e1"));
         when(teamRepository.findAllByCrewContaining("employee-id")).thenReturn(List.of(team1, team2, team3));
+        when(teamRepository.findAllByLeadId("employee-id")).thenReturn(List.of(team1, team3));
 
         // Test
         Throwable e = catchThrowable(() -> employeeService.deleteEmployee("employee-id"));
 
         // Verify
         assertThat(e).isInstanceOf(IngHttpException.class);
-        assertThat(e.getMessage()).isEqualTo("Employee participates in the following chains: chain1, chain2\nEmployee is a member of the following teams: team 1, team 2, team 3\nCannot be deleted.");
+        assertThat(e.getMessage()).isEqualTo("Employee participates in the following chains: chain1, chain2\n" +
+                "Employee is a member of the following teams: team 1, team 2, team 3\n" +
+                "Employee is a lead of the following teams: team 1, team 3\n" +
+                "Cannot be deleted.");
         assertThat(((IngHttpException)e).getHttpStatus()).isEqualTo(400);
     }
 }

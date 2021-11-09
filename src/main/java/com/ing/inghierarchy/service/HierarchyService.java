@@ -68,6 +68,7 @@ public class HierarchyService {
                 ManagerResponse managerResponse;
                 if (firstInChain && hierarchyChain.getManager() != null) {
                     managerResponse = hierarchyChain.getManager(); // switch to already existing manager, assumption is that first in chain will always be the same for each chain
+                    hierarchyChain.setManager(managerResponse);
                 } else {
                     managerResponse = new ManagerResponse();
                     managerResponse.setId(currentManagerDetails.getId());
@@ -87,7 +88,6 @@ public class HierarchyService {
                 previousManagerResponse = managerResponse;
                 currentManager = teamManagement.getManagersChain().stream().filter(m -> m.getManagerId().equals(manages)).findFirst().orElseThrow(() ->
                         IngHttpException.badRequest("Broken link in management chain: " + teamManagement.getId()));
-                hierarchyChain.setManager(managerResponse);
                 firstInChain = false;
             }
 
@@ -108,6 +108,17 @@ public class HierarchyService {
                 teamResponse.setId(team.getId());
                 teamResponse.setTitle(team.getTitle());
                 teamResponse.setTeamType(teamTypeRepository.findById(team.getTeamType()).orElse(TeamType.builder().title("Not assigned").build()).getTitle());
+
+                Employee lead = employeeRepository.findById(team.getLeadId()).orElseThrow(() ->
+                        IngHttpException.notFound(String.format("Team lead for team: %s not found", team.getTitle())));
+                var leadResponse = TeamMemberResponse.builder()
+                        .id(lead.getId())
+                        .name(lead.getName())
+                        .corporateId(lead.getCorporateId())
+                        .role(roleRepository.findById(lead.getRoleId()).orElse(Role.builder().title("Not assigned").build()).getTitle())
+                        .build();
+                teamResponse.setLead(leadResponse);
+
                 for (String teamMemberId : team.getCrew()) {
                     Employee teamMember = employeeRepository.findById(teamMemberId).orElse(null);
                     if (teamMember != null) {

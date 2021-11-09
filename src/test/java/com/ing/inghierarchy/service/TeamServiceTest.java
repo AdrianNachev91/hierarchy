@@ -42,8 +42,9 @@ class TeamServiceTest {
     void createTeam() {
 
         // Prepare
-        var teamRequest = teamRequest("Team name", "managedBy-id", "teamType-id");
+        var teamRequest = teamRequest("Team name", "managedBy-id", "leadId", "teamType-id");
         when(managementChainRepository.existsById("managedBy-id")).thenReturn(true);
+        when(employeeRepository.existsById("leadId")).thenReturn(true);
         when(teamTypeRepository.existsById("teamType-id")).thenReturn(true);
         var team = new ModelMapper().map(teamRequest, Team.class);
         when(teamRepository.save(team)).thenReturn(team.setId("team-id"));
@@ -59,7 +60,7 @@ class TeamServiceTest {
     void createTeam_ManagementChainNotFound() {
 
         // Prepare
-        var teamRequest = teamRequest("Team name", "managedBy-id", "teamType-id");
+        var teamRequest = teamRequest("Team name", "managedBy-id", "leadId", "teamType-id");
         when(managementChainRepository.existsById("managedBy-id")).thenReturn(false);
 
         // Test
@@ -69,6 +70,26 @@ class TeamServiceTest {
         assertThat(e).isInstanceOf(IngHttpException.class);
         assertThat(((IngHttpException)e).getHttpStatus()).isEqualTo(404);
         assertThat(e.getMessage()).isEqualTo("Management chain not found");
+        verify(employeeRepository, never()).existsById(anyString());
+        verify(teamTypeRepository, never()).existsById(anyString());
+        verify(teamRepository, never()).save(any(Team.class));
+    }
+
+    @Test
+    void createTeam_LeadNotFound() {
+
+        // Prepare
+        var teamRequest = teamRequest("Team name", "managedBy-id", "leadId", "teamType-id");
+        when(managementChainRepository.existsById("managedBy-id")).thenReturn(true);
+        when(employeeRepository.existsById("leadId")).thenReturn(false);
+
+        // Test
+        Throwable e = catchThrowable(() -> teamService.createTeam(teamRequest));
+
+        // Verify
+        assertThat(e).isInstanceOf(IngHttpException.class);
+        assertThat(((IngHttpException)e).getHttpStatus()).isEqualTo(404);
+        assertThat(e.getMessage()).isEqualTo("Lead not found");
         verify(teamTypeRepository, never()).existsById(anyString());
         verify(teamRepository, never()).save(any(Team.class));
     }
@@ -77,8 +98,9 @@ class TeamServiceTest {
     void createTeam_TeamTypeNotFound() {
 
         // Prepare
-        var teamRequest = teamRequest("Team name", "managedBy-id", "teamType-id");
+        var teamRequest = teamRequest("Team name", "managedBy-id", "leadId", "teamType-id");
         when(managementChainRepository.existsById("managedBy-id")).thenReturn(true);
+        when(employeeRepository.existsById("leadId")).thenReturn(true);
         when(teamTypeRepository.existsById("teamType-id")).thenReturn(false);
 
         // Test
@@ -95,8 +117,9 @@ class TeamServiceTest {
     void updateTeam() {
 
         // Prepare
-        var teamRequest = teamRequest("Team name", "managedBy-id", "teamType-id");
+        var teamRequest = teamRequest("Team name", "managedBy-id", "leadId", "teamType-id");
         when(managementChainRepository.existsById("managedBy-id")).thenReturn(true);
+        when(employeeRepository.existsById("leadId")).thenReturn(true);
         when(teamTypeRepository.existsById("teamType-id")).thenReturn(true);
         var team = new ModelMapper().map(teamRequest, Team.class);
         when(teamRepository.findById("team-id")).thenReturn(Optional.of(team));
@@ -113,8 +136,9 @@ class TeamServiceTest {
     void updateTeam_TeamNotFound() {
 
         // Prepare
-        var teamRequest = teamRequest("Team name", "managedBy-id", "teamType-id");
+        var teamRequest = teamRequest("Team name", "managedBy-id", "leadId", "teamType-id");
         when(managementChainRepository.existsById("managedBy-id")).thenReturn(true);
+        when(employeeRepository.existsById("leadId")).thenReturn(true);
         when(teamTypeRepository.existsById("teamType-id")).thenReturn(true);
         when(teamRepository.findById("team-id")).thenReturn(Optional.empty());
 
@@ -132,7 +156,7 @@ class TeamServiceTest {
     void updateTeam_ManagementChainNotFound() {
 
         // Prepare
-        var teamRequest = teamRequest("Team name", "managedBy-id", "teamType-id");
+        var teamRequest = teamRequest("Team name", "managedBy-id", "leadId", "teamType-id");
         when(managementChainRepository.existsById("managedBy-id")).thenReturn(false);
 
         // Test
@@ -142,7 +166,29 @@ class TeamServiceTest {
         assertThat(e).isInstanceOf(IngHttpException.class);
         assertThat(((IngHttpException)e).getHttpStatus()).isEqualTo(404);
         assertThat(e.getMessage()).isEqualTo("Management chain not found");
+        verify(employeeRepository, never()).existsById(anyString());
         verify(teamTypeRepository, never()).existsById(anyString());
+        verify(teamRepository, never()).findById(anyString());
+        verify(teamRepository, never()).save(any(Team.class));
+    }
+
+    @Test
+    void updateTeam_LeadNotFound() {
+
+        // Prepare
+        var teamRequest = teamRequest("Team name", "managedBy-id", "leadId", "teamType-id");
+        when(managementChainRepository.existsById("managedBy-id")).thenReturn(true);
+        when(employeeRepository.existsById("leadId")).thenReturn(false);
+
+        // Test
+        Throwable e = catchThrowable(() -> teamService.updateTeam("team-id", teamRequest));
+
+        // Verify
+        assertThat(e).isInstanceOf(IngHttpException.class);
+        assertThat(((IngHttpException)e).getHttpStatus()).isEqualTo(404);
+        assertThat(e.getMessage()).isEqualTo("Lead not found");
+        verify(teamTypeRepository, never()).existsById(anyString());
+        verify(teamRepository, never()).findById(anyString());
         verify(teamRepository, never()).save(any(Team.class));
     }
 
@@ -150,8 +196,9 @@ class TeamServiceTest {
     void updateTeam_TeamTypeNotFound() {
 
         // Prepare
-        var teamRequest = teamRequest("Team name", "managedBy-id", "teamType-id");
+        var teamRequest = teamRequest("Team name", "managedBy-id", "leadId", "teamType-id");
         when(managementChainRepository.existsById("managedBy-id")).thenReturn(true);
+        when(employeeRepository.existsById("leadId")).thenReturn(true);
         when(teamTypeRepository.existsById("teamType-id")).thenReturn(false);
 
         // Test
@@ -161,6 +208,7 @@ class TeamServiceTest {
         assertThat(e).isInstanceOf(IngHttpException.class);
         assertThat(((IngHttpException)e).getHttpStatus()).isEqualTo(404);
         assertThat(e.getMessage()).isEqualTo("Team type does not exist");
+        verify(teamRepository, never()).findById(anyString());
         verify(teamRepository, never()).save(any(Team.class));
     }
 

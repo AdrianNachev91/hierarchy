@@ -9,5 +9,5 @@ import static com.ing.inghierarchy.IngHierarchyApplication.ING_HIERARCHY;
 @ConfigurationProperties(ING_HIERARCHY)
 public class HierarchyProperties {
 
-    private String domain = "https://localhost:8080";
+    private String domain = "http://localhost:8080";
 }
