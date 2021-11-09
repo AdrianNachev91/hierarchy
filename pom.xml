@@ -8,11 +8,11 @@
 		<version>2.5.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.ing</groupId>
-	<artifactId>ing-hierarchy</artifactId>
+	<groupId>com.hierarchy</groupId>
+	<artifactId>hierarchy</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>ing-hierarchy</name>
-	<description>ING Hierarchies</description>
+	<name>hierarchy</name>
+	<description>Hierarchies</description>
 	<properties>
 		<java.version>11</java.version>
 		<okhttp.version>4.9.2</okhttp.version>
@@ -47,7 +47,7 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>1.5.11</version>
+			<version>1.5.12</version>
 		</dependency>
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
