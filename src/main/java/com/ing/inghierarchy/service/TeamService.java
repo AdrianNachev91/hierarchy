@@ -28,6 +28,7 @@ public class TeamService {
     public Team createTeam(TeamRequest teamRequest) {
 
         checkManagementChainExist(teamRequest.getManagedBy());
+        checkLeadExists(teamRequest.getLeadId());
         checkTeamTypeExists(teamRequest.getTeamType());
 
         Team team = teamRepository.save(new ModelMapper().map(teamRequest, Team.class));
@@ -38,6 +39,7 @@ public class TeamService {
     public Team updateTeam(String id, TeamRequest teamRequest) {
 
         checkManagementChainExist(teamRequest.getManagedBy());
+        checkLeadExists(teamRequest.getLeadId());
         checkTeamTypeExists(teamRequest.getTeamType());
 
 
@@ -102,6 +104,12 @@ public class TeamService {
         checkTeamExists(id);
 
         teamRepository.deleteById(id);
+    }
+
+    private void checkLeadExists(String managedBy) {
+        if (!employeeRepository.existsById(managedBy)) {
+            throw IngHttpException.notFound("Lead not found");
+        }
     }
 
     private void checkManagementChainExist(String managedBy) {

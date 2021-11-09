@@ -2,6 +2,7 @@ package com.ing.inghierarchy;
 
 import com.ing.inghierarchy.domain.*;
 import com.ing.inghierarchy.web.request.EmployeeRequest;
+import com.ing.inghierarchy.web.request.RoleRequest;
 import com.ing.inghierarchy.web.request.TeamRequest;
 import com.ing.inghierarchy.web.TeamTypeRequest;
 
@@ -22,12 +23,12 @@ public class TestUtils {
         return EmployeeRequest.builder().name(name).corporateId(corporateId).roleId(roleId).build();
     }
 
-    public static Team team(String title, String managedBy, String teamType) {
-        return Team.builder().title(title).managedBy(managedBy).teamType(teamType).build();
+    public static Team team(String title, String managedBy, String leadId, String teamType) {
+        return Team.builder().title(title).managedBy(managedBy).leadId(leadId).teamType(teamType).build();
     }
 
-    public static TeamRequest teamRequest(String title, String managedBy, String teamType) {
-        return TeamRequest.builder().title(title).managedBy(managedBy).teamType(teamType).build();
+    public static TeamRequest teamRequest(String title, String managedBy, String leadId, String teamType) {
+        return TeamRequest.builder().title(title).managedBy(managedBy).leadId(leadId).teamType(teamType).build();
     }
 
     public static TeamType teamType(String title) {
@@ -44,5 +45,13 @@ public class TestUtils {
 
     public static ManagementChain.ManagerInChain managerInChain(String managerId, String managesId) {
         return ManagementChain.ManagerInChain.builder().managerId(managerId).manages(managesId).build();
+    }
+
+    public static Role role(String title) {
+        return Role.builder().title(title).build();
+    }
+
+    public static RoleRequest roleRequest(String title) {
+        return RoleRequest.builder().title(title).build();
     }
 }

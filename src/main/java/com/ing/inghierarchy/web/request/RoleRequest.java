@@ -1,6 +1,9 @@
 package com.ing.inghierarchy.web.request;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
@@ -10,13 +13,8 @@ import javax.validation.constraints.NotBlank;
 @Builder
 @Accessors(chain = true)
 @Data
-public class TeamRequest {
+public class RoleRequest {
+
     @NotBlank
     private String title;
-    @NotBlank
-    private String managedBy;
-    @NotBlank
-    private String leadId;
-    @NotBlank
-    private String teamType;
 }

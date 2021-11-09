@@ -4,6 +4,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 
 import javax.validation.Valid;
 
+import com.ing.inghierarchy.web.request.RoleRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,20 +43,20 @@ public class RoleController {
 		return roleRepository.findById(id).orElseThrow(() -> IngHttpException.notFound("Role not found"));
 	}
 	
-	@PostMapping("/")
+	@PostMapping
     @ResponseStatus(CREATED)
-    public Role createRole(@RequestBody @Valid Role role) {
-        return roleService.createRole(role);
+    public Role createRole(@RequestBody @Valid RoleRequest roleRequest) {
+        return roleService.createRole(roleRequest);
     }
 
     @PutMapping("/{id}")
     public Role updateRole(@Parameter(name = "id", required = true) @PathVariable("id") String id,
-                                 @RequestBody @Valid Role role) {
-        return roleService.updateRole(id, role);
+                                 @RequestBody @Valid RoleRequest roleRequest) {
+        return roleService.updateRole(id, roleRequest);
     }
     
     @DeleteMapping("/{id}")
-    public boolean deleteRole(@Parameter(name = "id", required = true) @PathVariable("id") String id) {
-		return roleService.deleteRole(id);
+    public void deleteRole(@Parameter(name = "id", required = true) @PathVariable("id") String id) {
+		roleService.deleteRole(id);
     }
 }

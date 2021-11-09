@@ -1,7 +1,8 @@
 package com.ing.inghierarchy.web;
 
+import static com.ing.inghierarchy.TestUtils.*;
 import static com.ing.inghierarchy.TestUtils.json;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -77,162 +78,101 @@ public class RoleControllerTest {
     @Test
     void createRole() throws Exception {
 
-        Role role = Role.builder().id("1").title("role").build();
-        when(roleRepository.findRoleByTitle(role.getTitle())).thenReturn(null);
-        when(roleRepository.findById(role.getId())).thenReturn(Optional.empty());
-        when(roleService.roleExists(role)).thenReturn(false);
-        when(roleService.createRole(role)).thenReturn(role);
-
-        String jsonRequest =
-                "{" +
-                        String.format("'id':'%s'", role.getId()) + "," +
-                        String.format("'title':'%s'", role.getTitle()) +
-                        "}";
-
-        String jsonResponse =
-                "{" +
-                        String.format("'id':'%s'", role.getId()) + "," +
-                        String.format("'title':'%s'", role.getTitle()) +
-                        "}";
+        Role role = role("title").setId("1");
+        when(roleService.createRole(roleRequest("title"))).thenReturn(role);
 
         mockMvc.perform(post("/role/")
                         .contentType(APPLICATION_JSON)
-                        .content(json(jsonRequest))
+                        .content(json("{'title':'title'}"))
                         .characterEncoding("utf-8"))
                 .andExpect(status().isCreated())
-                .andExpect(content().json(json(jsonResponse)));
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(content().json(json("{" +
+                        "   'id':'1'," +
+                        "   'title':title" +
+                        "}")));
     }
 
     @Test
-    void createRole_Exists() throws Exception {
+    void createRole_Invalid() throws Exception {
 
-        Role role = Role.builder().id("1").title("role").build();
-        when(roleRepository.findRoleByTitle(role.getTitle())).thenReturn(role);
-        when(roleRepository.findById(role.getId())).thenReturn(Optional.of(role));
-        when(roleService.roleExists(role)).thenReturn(true);
-        when(roleService.createRole(role)).thenThrow(IngHttpException.badRequest("Role already exists"));
-
-        String jsonRequest =
-                "{" +
-                        String.format("'id':'%s'", role.getId()) + "," +
-                        String.format("'title':'%s'", role.getTitle()) +
-                        "}";
-
-        String jsonResponse =
-                "{" +
-                        String.format("'message':'%s'", "Role already exists") +
-                        "}";
-
-        mockMvc.perform(post("/role/")
+        mockMvc.perform(post("/role")
                         .contentType(APPLICATION_JSON)
-                        .content(json(jsonRequest))
+                        .content(json("{'title':''}"))
                         .characterEncoding("utf-8"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json(json(jsonResponse)));
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(content().json(json("{" +
+                        "   'errors':{" +
+                        "       'title':'must not be blank'" +
+                        "   }" +
+                        "}")));
     }
 
     @Test
     void updateRole() throws Exception {
 
-        Role role = Role.builder().id("1").title("role").build();
-        role.setTitle("updated-role");
-        when(roleRepository.findRoleByTitle(role.getTitle())).thenReturn(null);
-        when(roleRepository.findById(role.getId())).thenReturn(Optional.empty());
-        when(roleService.roleExists(role)).thenReturn(false);
-        when(roleService.updateRole(role.getId(), role)).thenReturn(role);
+        var role = role("updated-role").setId("id");
+        when(roleService.updateRole("id", roleRequest("updated-role"))).thenReturn(role);
 
-        String jsonRequest =
-                "{" +
-                        String.format("'id':'%s'", role.getId()) + "," +
-                        String.format("'title':'%s'", role.getTitle()) +
-                        "}";
-
-        String jsonResponse =
-                "{" +
-                        String.format("'id':'%s'", role.getId()) + "," +
-                        String.format("'title':'%s'", role.getTitle()) +
-                        "}";
-
-        mockMvc.perform(put("/role/{id}", role.getId())
+        mockMvc.perform(put("/role/{id}", "id")
                         .contentType(APPLICATION_JSON)
-                        .content(json(jsonRequest))
+                        .content(json("{'title':'updated-role'}"))
                         .characterEncoding("utf-8"))
                 .andExpect(status().isOk())
-                .andExpect(content().json(json(jsonResponse)));
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(content().json(json("{" +
+                        "   'id':'id'," +
+                        "   'title':'updated-role'" +
+                        "}")));
     }
 
     @Test
-    void updateRole_Exists() throws Exception {
+    void updateRole_NotFound() throws Exception {
 
-        Role role = Role.builder().id("1").title("role").build();
-        role.setTitle("updated-role");
-        when(roleRepository.findRoleByTitle(role.getTitle())).thenReturn(role);
-        when(roleRepository.findById(role.getId())).thenReturn(Optional.of(role));
-        when(roleService.roleExists(role)).thenReturn(true);
-        when(roleService.updateRole(role.getId(), role)).thenThrow(IngHttpException.badRequest("Role already exists"));
+        when(roleService.updateRole("id", roleRequest("updated-role"))).thenThrow(IngHttpException.notFound("Role not found"));
 
-        String jsonRequest =
-                "{" +
-                        String.format("'id':'%s'", role.getId()) + "," +
-                        String.format("'title':'%s'", role.getTitle()) +
-                        "}";
-
-        String jsonResponse =
-                "{" +
-                        String.format("'message':'%s'", "Role already exists") +
-                        "}";
-
-        mockMvc.perform(put("/role/{id}", role.getId())
+        mockMvc.perform(put("/role/{id}", "id")
                         .contentType(APPLICATION_JSON)
-                        .content(json(jsonRequest))
+                        .content(json("{'title':'updated-role'}"))
+                        .characterEncoding("utf-8"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(content().json(json("{'message':'Role not found'}")));
+    }
+
+    @Test
+    void updateRole_Invalid() throws Exception {
+
+        mockMvc.perform(put("/role/{id}", "id")
+                        .contentType(APPLICATION_JSON)
+                        .content(json("{'title':''}"))
                         .characterEncoding("utf-8"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json(json(jsonResponse)));
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(content().json(json("{" +
+                        "   'errors':{" +
+                        "       'title':'must not be blank'" +
+                        "   }" +
+                        "}")));
     }
 
     @Test
     void deleteRole() throws Exception {
 
-        Role role = Role.builder().id("1").title("role").build();
-        boolean isDeleted = true;
-        when(roleService.deleteRole(role.getId())).thenReturn(isDeleted);
+        mockMvc.perform(delete("/role/{id}", "id"))
+                .andExpect(status().isOk());
 
-
-        mockMvc.perform(delete("/role/{id}", role.getId()))
-                .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("true")));
+        verify(roleService).deleteRole("id");
     }
 
     @Test
     void deleteRole_NotFound() throws Exception {
 
-        Role role = Role.builder().id("1").title("role").build();
-        when(roleService.deleteRole(role.getId())).thenThrow(IngHttpException.notFound("No Role found to delete"));
+        doThrow(IngHttpException.notFound("No Role found to delete")).when(roleService).deleteRole("id");
 
-        String jsonResponse =
-                "{" +
-                        String.format("'message':'%s'", "No Role found to delete") +
-                        "}";
-
-        mockMvc.perform(delete("/role/{id}", role.getId()))
+        mockMvc.perform(delete("/role/{id}", "id"))
                 .andExpect(status().isNotFound())
-                .andExpect(content().json(json(jsonResponse)));
-    }
-
-    @Test
-    void deleteRole_InUse() throws Exception {
-
-        Role role = Role.builder().id("1").title("role").build();
-        when(roleService.deleteRole(role.getId())).thenThrow(IngHttpException.badRequest("Role is in use"));
-
-        String jsonResponse =
-                "{" +
-                        String.format("'message':'%s'", "Role is in use") +
-                        "}";
-
-        mockMvc.perform(delete("/role/{id}", role.getId()))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(json(jsonResponse)));
-
+                .andExpect(content().json(json("{'message':'No Role found to delete'}")));
     }
 }

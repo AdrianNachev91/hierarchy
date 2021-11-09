@@ -112,9 +112,9 @@ class TeamTypeServiceTest {
 
         // Prepare
         when(teamTypeRepository.existsById("teamType-id")).thenReturn(true);
-        var team1 = team("team 1", null, "teamType-id");
-        var team2 = team("team 2", null, "teamType-id");
-        var team3 = team("team 3", null, "teamType-id");
+        var team1 = team("team 1", null, null, "teamType-id");
+        var team2 = team("team 2", null, null, "teamType-id");
+        var team3 = team("team 3", null, null, "teamType-id");
         when(teamRepository.findAllByTeamType("teamType-id")).thenReturn(List.of(team1, team2, team3));
 
         // Test

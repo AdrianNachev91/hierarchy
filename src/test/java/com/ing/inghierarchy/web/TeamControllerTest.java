@@ -44,7 +44,7 @@ class TeamControllerTest {
     void createTeam() throws Exception {
 
         // Prepare
-        Team team = team("Team name", "managedBy-id", "teamType-id");
+        Team team = team("Team name", "managedBy-id", "leadId", "teamType-id");
         when(teamService.createTeam(new ModelMapper().map(team, TeamRequest.class))).thenReturn(team);
 
         // Test & Verify
@@ -53,6 +53,7 @@ class TeamControllerTest {
                         .content(json("{" +
                                 "'title':'Team name'," +
                                 "'managedBy':'managedBy-id'," +
+                                "'leadId':'leadId'," +
                                 "'teamType':'teamType-id'" +
                                 "}"))
                         .characterEncoding("utf-8"))
@@ -61,6 +62,7 @@ class TeamControllerTest {
                 .andExpect(content().json(json("{" +
                         "'title':'Team name'," +
                         "'managedBy':'managedBy-id'," +
+                        "'leadId':'leadId'," +
                         "'teamType':'teamType-id'" +
                         "}")));
     }
@@ -69,7 +71,7 @@ class TeamControllerTest {
     void createTeam_MANAGER_NOT_FOUND() throws Exception {
 
         // Prepare
-        TeamRequest teamRequest = teamRequest("Team name", "managedBy-id", "teamType-id");
+        TeamRequest teamRequest = teamRequest("Team name", "managedBy-id", "leadId", "teamType-id");
         when(teamService.createTeam(teamRequest)).thenThrow(IngHttpException.notFound("Manager not found"));
 
         // Test & Verify
@@ -78,6 +80,7 @@ class TeamControllerTest {
                         .content(json("{" +
                                 "'title':'Team name'," +
                                 "'managedBy':'managedBy-id'," +
+                                "'leadId':'leadId'," +
                                 "'teamType':'teamType-id'" +
                                 "}"))
                         .characterEncoding("utf-8"))
@@ -104,6 +107,7 @@ class TeamControllerTest {
                         "   {" +
                         "       'title':'must not be blank'," +
                         "       'managedBy':'must not be blank'," +
+                        "       'leadId':'must not be blank'," +
                         "       'teamType':'must not be blank'" +
                         "   }" +
                         "}")));
@@ -113,7 +117,7 @@ class TeamControllerTest {
     void updateTeam() throws Exception {
 
         // Prepare
-        Team team = team("Team name", "managedBy-id", "teamType-id");
+        Team team = team("Team name", "managedBy-id", "leadId", "teamType-id");
         when(teamService.updateTeam("team-id", new ModelMapper().map(team, TeamRequest.class))).thenReturn(team.setId("team-id"));
 
         // Test & Verify
@@ -122,6 +126,7 @@ class TeamControllerTest {
                         .content(json("{" +
                                 "'title':'Team name'," +
                                 "'managedBy':'managedBy-id'," +
+                                "'leadId':'leadId'," +
                                 "'teamType':'teamType-id'" +
                                 "}"))
                         .characterEncoding("utf-8"))
@@ -131,6 +136,7 @@ class TeamControllerTest {
                         "'id':'team-id'," +
                         "'title':'Team name'," +
                         "'managedBy':'managedBy-id'," +
+                        "'leadId':'leadId'," +
                         "'teamType':'teamType-id'" +
                         "}")));
     }
@@ -139,7 +145,7 @@ class TeamControllerTest {
     void updateTeam_TEAM_NOT_FOUND() throws Exception {
 
         // Prepare
-        TeamRequest teamRequest = teamRequest("Team name", "managedBy-id", "teamType-id");
+        TeamRequest teamRequest = teamRequest("Team name", "managedBy-id", "leadId", "teamType-id");
         when(teamService.updateTeam("team-id", teamRequest)).thenThrow(IngHttpException.notFound("Team not found"));
 
         // Test & Verify
@@ -148,6 +154,7 @@ class TeamControllerTest {
                         .content(json("{" +
                                 "'title':'Team name'," +
                                 "'managedBy':'managedBy-id'," +
+                                "'leadId':'leadId'," +
                                 "'teamType':'teamType-id'" +
                                 "}"))
                         .characterEncoding("utf-8"))
@@ -174,6 +181,7 @@ class TeamControllerTest {
                         "   {" +
                         "       'title':'must not be blank'," +
                         "       'managedBy':'must not be blank'," +
+                        "       'leadId':'must not be blank'," +
                         "       'teamType':'must not be blank'" +
                         "   }" +
                         "}")));

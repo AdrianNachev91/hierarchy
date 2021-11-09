@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EmployeeRepository extends MongoRepository<Employee, String>, EmployeeRepositoryCustom {
-    List<Employee> findByRoleId(String roleId);
+    List<Employee> findAllByRoleId(String roleId);
 }

@@ -49,11 +49,18 @@ public class EmployeeService {
             errorBuilder.append("Employee participates in the following chains: ").append(String.join(", ", chainIds)).append("\n");
         }
 
-        List<Team> teamsManaged = teamRepository.findAllByCrewContaining(id);
-        if (!teamsManaged.isEmpty()) {
-            List<String> teamNames = teamsManaged.stream().map(Team::getTitle).collect(Collectors.toList());
+        List<Team> teamsPartOf = teamRepository.findAllByCrewContaining(id);
+        if (!teamsPartOf.isEmpty()) {
+            List<String> teamNames = teamsPartOf.stream().map(Team::getTitle).collect(Collectors.toList());
             errorBuilder.append("Employee is a member of the following teams: ").append(String.join(", ", teamNames)).append("\n");
         }
+
+        List<Team> teamsLeadOf = teamRepository.findAllByLeadId(id);
+        if (!teamsPartOf.isEmpty()) {
+            List<String> teamNames = teamsLeadOf.stream().map(Team::getTitle).collect(Collectors.toList());
+            errorBuilder.append("Employee is a lead of the following teams: ").append(String.join(", ", teamNames)).append("\n");
+        }
+
         if (errorBuilder.length() != 0) {
             throw IngHttpException.badRequest(errorBuilder.append("Cannot be deleted.").toString());
         }

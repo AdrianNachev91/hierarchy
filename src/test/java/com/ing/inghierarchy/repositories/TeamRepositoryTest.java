@@ -32,9 +32,9 @@ class TeamRepositoryTest {
     void findAllByManagedBy() {
 
         // Prepare
-        var team1 = team("team 1", "managedBy-id1", null).setId("team1-id");
-        var team2 = team("team 2", "managedBy-id2", null).setId("team2-id");
-        var team3 = team("team 3", "managedBy-id1", null).setId("team3-id");
+        var team1 = team("team 1", "managedBy-id1", null, null).setId("team1-id");
+        var team2 = team("team 2", "managedBy-id2", null, null).setId("team2-id");
+        var team3 = team("team 3", "managedBy-id1", null, null).setId("team3-id");
         teamRepository.saveAll(List.of(team1, team2, team3));
 
         // Test
@@ -56,9 +56,9 @@ class TeamRepositoryTest {
     void findAllByCrewContaining() {
 
         // Prepare
-        var team1 = team("team 1", null, null).setId("team1-id").setCrew(List.of("member1", "member2"));
-        var team2 = team("team 2", null, null).setId("team2-id").setCrew(List.of("member2"));
-        var team3 = team("team 3", null, null).setId("team3-id").setCrew(List.of("member3", "member4"));
+        var team1 = team("team 1", null, null, null).setId("team1-id").setCrew(List.of("member1", "member2"));
+        var team2 = team("team 2", null, null, null).setId("team2-id").setCrew(List.of("member2"));
+        var team3 = team("team 3", null, null, null).setId("team3-id").setCrew(List.of("member3", "member4"));
         teamRepository.saveAll(List.of(team1, team2, team3));
 
         // Test
@@ -80,9 +80,9 @@ class TeamRepositoryTest {
     void findAllByTeamType() {
 
         // Prepare
-        var team1 = team("team 1", null, "teamType1").setId("team1-id");
-        var team2 = team("team 2", null, "teamType1").setId("team2-id");
-        var team3 = team("team 3", null, "teamType2").setId("team3-id");
+        var team1 = team("team 1", null, null, "teamType1").setId("team1-id");
+        var team2 = team("team 2", null, null, "teamType1").setId("team2-id");
+        var team3 = team("team 3", null, null, "teamType2").setId("team3-id");
         teamRepository.saveAll(List.of(team1, team2, team3));
 
         // Test

@@ -19,5 +19,6 @@ public class TeamResponse {
     private String id;
     private String title;
     private String teamType; // title of team type here
+    private TeamMemberResponse lead;
     private Set<TeamMemberResponse> crew = new HashSet<>();
 }
