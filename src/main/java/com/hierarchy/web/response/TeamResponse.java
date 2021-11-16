@@ -6,8 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -20,5 +20,6 @@ public class TeamResponse {
     private String title;
     private String teamType; // title of team type here
     private TeamMemberResponse lead;
-    private Set<TeamMemberResponse> crew = new HashSet<>();
+    @Builder.Default
+    private List<TeamMemberResponse> crew = new ArrayList<>();
 }

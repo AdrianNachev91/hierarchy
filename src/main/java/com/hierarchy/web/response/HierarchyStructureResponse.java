@@ -15,4 +15,5 @@ public class HierarchyStructureResponse {
     private HierarchyChain hierarchyChain;
     private String previous; // link to previous set of teams
     private String next; // link to next set of teams
+    private long total;
 }
