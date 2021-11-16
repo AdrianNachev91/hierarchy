@@ -6,8 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -20,6 +20,8 @@ public class ManagerResponse {
     private String corporateId;
     private String role;
     private String name;
-    private Set<ManagerResponse> manages = new HashSet<>(); // if this is empty then this is the team lead
-    private Set<TeamResponse> teamsManaged = new HashSet<>();
+    @Builder.Default
+    private List<ManagerResponse> manages = new ArrayList<>(); // if this is empty then this is the team lead
+    @Builder.Default
+    private List<TeamResponse> teamsManaged = new ArrayList<>();
 }

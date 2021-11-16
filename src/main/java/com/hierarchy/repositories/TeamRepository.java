@@ -14,4 +14,5 @@ public interface TeamRepository extends MongoRepository<Team, String>, TeamRepos
     List<Team> findAllByTeamType(String teamTypeId);
     List<Team> findAllByLeadId(String leadId);
     boolean existsByManagedBy(String managedBy);
+    long countAllByTeamType(String teamTypeId);
 }
