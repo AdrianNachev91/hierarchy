@@ -9,8 +9,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,13 +24,13 @@ public class ManagementChain {
 
     public static final String FIELD_ID = "id";
     public static final String FIELD_ATTACHED_TO_TEAM = "attachedToTeam";
-    public static final String FIELD_MANAGER_ID = "managerChain.managerId";
+    public static final String FIELD_MANAGER_ID = "managersChain.managerId";
 
     @Id
     private String id;
     private boolean attachedToTeam; // Whether the chain leads to a team or not, false by default
     @Builder.Default
-    private Set<ManagerInChain> managersChain = new HashSet<>();
+    private List<ManagerInChain> managersChain = new ArrayList<>();
 
     @NoArgsConstructor
     @AllArgsConstructor

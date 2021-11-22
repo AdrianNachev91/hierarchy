@@ -158,10 +158,10 @@ class EmployeeServiceTest {
         // Prepare
         when(employeeRepository.existsById("employee-id")).thenReturn(true);
         var chain1 = managementChain(true,
-                Set.of(managerInChain("employee-id", "leader"), managerInChain("leader", null))
+                List.of(managerInChain("employee-id", "leader"), managerInChain("leader", null))
         ).setId("chain1");
         var chain2 = managementChain(false,
-                Set.of(managerInChain("employee-id", null))
+                List.of(managerInChain("employee-id", null))
         ).setId("chain2");
         when(managementChainRepository.findAllByEmployeeId("employee-id")).thenReturn(List.of(chain1, chain2));
         var team1 = team("team 1", null, "employee-id", null).setCrew(List.of("employee-id", "e2", "e3"));

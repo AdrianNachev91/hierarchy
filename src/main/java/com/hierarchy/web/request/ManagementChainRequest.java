@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -18,7 +19,7 @@ import java.util.Set;
 public class ManagementChainRequest {
 
     @NotEmpty
-    private Set<ManagementChain.ManagerInChain> managersChain;
+    private List<ManagementChain.ManagerInChain> managersChain;
 
     public ManagementChain toManagementChain() {
         return ManagementChain.builder().managersChain(this.managersChain).build();
