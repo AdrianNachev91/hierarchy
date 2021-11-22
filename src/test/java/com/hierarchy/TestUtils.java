@@ -6,8 +6,8 @@ import com.hierarchy.web.request.RoleRequest;
 import com.hierarchy.web.request.TeamRequest;
 import com.hierarchy.web.TeamTypeRequest;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestUtils {
 
@@ -39,8 +39,8 @@ public class TestUtils {
         return TeamTypeRequest.builder().title(title).build();
     }
 
-    public static ManagementChain managementChain(boolean attachedToTeam, Set<ManagementChain.ManagerInChain> managementChains) {
-        return ManagementChain.builder().attachedToTeam(attachedToTeam).managersChain(new HashSet<>(managementChains)).build();
+    public static ManagementChain managementChain(boolean attachedToTeam, List<ManagementChain.ManagerInChain> managementChains) {
+        return ManagementChain.builder().attachedToTeam(attachedToTeam).managersChain(managementChains != null ? new ArrayList<>(managementChains) : null).build();
     }
 
     public static ManagementChain.ManagerInChain managerInChain(String managerId, String managesId) {

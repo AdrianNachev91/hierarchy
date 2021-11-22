@@ -145,15 +145,15 @@ class HierarchyServiceTest {
         List<Team> teams = List.of(team1, team2);
         when(teamRepository.fetchTeamsWithPaginationByTeamType("teamType-id", limit, offset)).thenReturn(teams);
 
-        var teamManagement1 = managementChain(true, Set.of(
+        var teamManagement1 = managementChain(true, List.of(
                 managerInChain("manager-id1", "manager-id2"),
                 managerInChain("manager-id2", null))
         ).setId("managerChain-id1");
-        var teamManagement2 = managementChain(true, Set.of(
+        var teamManagement2 = managementChain(true, List.of(
                 managerInChain("manager-id1", "manager-id3"),
                 managerInChain("manager-id3", null))
         ).setId("managerChain-id2");
-        var teamManagement3 = managementChain(false, Set.of(
+        var teamManagement3 = managementChain(false, List.of(
                 managerInChain("manager-id1", "manager-id3"),
                 managerInChain("manager-id3", null))
         ).setId("managerChain-id3");
