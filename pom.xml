@@ -14,29 +14,6 @@
     <name>hierarchy</name>
     <description>Hierarchies</description>
 
-    <repositories>
-        <repository>
-            <id>P13828-merak-incoming</id>
-            <url>https://pkgs.dev.azure.com/IngEurCDaaS01/IngOne/_packaging/P13828-merak-incoming/maven/v1</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>P13828-merak-incoming</id>
-            <name>P13828-merak-incoming</name>
-            <url>https://pkgs.dev.azure.com/IngEurCDaaS01/IngOne/_packaging/P13828-merak-incoming/maven/v1</url>
-        </pluginRepository>
-    </pluginRepositories>
-
     <properties>
         <java.version>11</java.version>
         <okhttp.version>4.9.2</okhttp.version>
